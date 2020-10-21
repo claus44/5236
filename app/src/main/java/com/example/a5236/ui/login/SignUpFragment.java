@@ -24,37 +24,37 @@ import android.widget.Toast;
 
 import com.example.a5236.R;
 
-public class LoginFragment extends Fragment {
+public class SignUpFragment extends Fragment {
 
-    private LoginViewModel loginViewModel;
+    private LoginViewModel signUpViewModel;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_login, container, false);
+        return inflater.inflate(R.layout.fragment_sign_up, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
+        signUpViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
         final EditText usernameEditText = view.findViewById(R.id.username);
         final EditText passwordEditText = view.findViewById(R.id.password);
-        final Button loginButton = view.findViewById(R.id.signup);
-        final Button registerButton = view.findViewById(R.id.register);
+        final Button signUpButton = view.findViewById(R.id.signup);
+        final Button loginButton = view.findViewById(R.id.login);
         final ProgressBar loadingProgressBar = view.findViewById(R.id.loading);
 
-        loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
+        signUpViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
             @Override
             public void onChanged(@Nullable LoginFormState loginFormState) {
                 if (loginFormState == null) {
                     return;
                 }
-                loginButton.setEnabled(loginFormState.isDataValid());
+                signUpButton.setEnabled(loginFormState.isDataValid());
                 if (loginFormState.getUsernameError() != null) {
                     usernameEditText.setError(getString(loginFormState.getUsernameError()));
                 }
@@ -64,7 +64,7 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        loginViewModel.getLoginResult().observe(getViewLifecycleOwner(), new Observer<LoginResult>() {
+        signUpViewModel.getLoginResult().observe(getViewLifecycleOwner(), new Observer<LoginResult>() {
             @Override
             public void onChanged(@Nullable LoginResult loginResult) {
                 if (loginResult == null) {
@@ -93,7 +93,7 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                loginViewModel.loginDataChanged(usernameEditText.getText().toString(),
+                signUpViewModel.loginDataChanged(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
             }
         };
@@ -104,31 +104,27 @@ public class LoginFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
+                    signUpViewModel.login(usernameEditText.getText().toString(),
                             passwordEditText.getText().toString());
                 }
                 return false;
             }
         });
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                if(loginViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString())){
-                    NavHostFragment.findNavController(LoginFragment.this)
-                            .navigate(R.id.action_loginFragment_to_signUpFragment);
-                }
-
+                signUpViewModel.login(usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString());
             }
         });
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    NavHostFragment.findNavController(LoginFragment.this)
-                            .navigate(R.id.action_loginFragment_to_signUpFragment);
+                NavHostFragment.findNavController(SignUpFragment.this)
+                        .navigate(R.id.action_signUpFragment_to_loginFragment);
             }
         });
     }
