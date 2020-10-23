@@ -30,4 +30,20 @@ public class Account {
     public void setScore(int score) {
         this.score = score;
     }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public void setUsername(String newUsername) {
+        this.username = newUsername;
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
+    public void setPassword(String newPassword){
+        this.password = newPassword;
+    }
 }
