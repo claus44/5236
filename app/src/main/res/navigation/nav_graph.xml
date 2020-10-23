@@ -22,5 +22,20 @@
         <action
             android:id="@+id/action_signUpFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_landmarkActivity"
+            app:destination="@id/landmarkActivity" />
     </fragment>
+
+    <fragment
+        android:id="@+id/landmarksListFragment"
+        android:name="com.example.a5236.LandmarksListFragment"
+        android:label="fragment_landmarks_list"
+        tools:layout="@layout/fragment_landmarks_list" />
+    <activity
+        android:id="@+id/landmarkActivity"
+        android:name="com.example.a5236.LandmarkActivity"
+        android:label="activity_landmark"
+        tools:layout="@layout/activity_landmark" />
+
 </navigation>
