@@ -8,10 +8,10 @@ public class Account {
     private List<Account> friends;
     private int score;
 
-    public Account(String username, String password, List<Account> friends, int score) {
+    public Account(String username, String password/*, List<Account> friends*/, int score) {
         this.username = username;
         this.password = password;
-        this.friends = friends;
+//        this.friends = friends;
         this.score = score;
     }
 

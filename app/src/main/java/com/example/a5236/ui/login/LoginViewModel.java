@@ -49,7 +49,7 @@ public class LoginViewModel extends ViewModel {
             loginResult.setValue(new LoginResult(R.string.password_confirmation_failed));
             return false;
         } else {
-            Result<LoggedInUser> result = loginRepository.login(username, password);
+            Result<LoggedInUser> result = loginRepository.register(username, password);
 
             if (result instanceof Result.Success) {
                 LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
