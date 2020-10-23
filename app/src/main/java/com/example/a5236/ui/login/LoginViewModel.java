@@ -43,25 +43,42 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
-    public boolean register(String username, String password) {
+    public boolean register(String username, String password, String passwordConfirmation) {
         // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.login(username, password);
-
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-            return true;
-        } else {
-            loginResult.setValue(new LoginResult(R.string.login_failed));
+        if(!password.equals(passwordConfirmation)) {
+            loginResult.setValue(new LoginResult(R.string.password_confirmation_failed));
             return false;
+        } else {
+            Result<LoggedInUser> result = loginRepository.login(username, password);
+
+            if (result instanceof Result.Success) {
+                LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
+                loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
+                return true;
+            } else {
+                loginResult.setValue(new LoginResult(R.string.registration_failed));
+                return false;
+            }
         }
     }
 
     public void loginDataChanged(String username, String password) {
         if (!isUserNameValid(username)) {
-            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
+            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null, null));
         } else if (!isPasswordValid(password)) {
-            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
+            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password, null));
+        } else {
+            loginFormState.setValue(new LoginFormState(true));
+        }
+    }
+
+    public void signUpDataChanged(String username, String password, String passwordConfirmation) {
+        if (!isUserNameValid(username)) {
+            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null, null));
+        } else if (!isPasswordValid(password)) {
+            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password, null));
+        } else if (!password.equals(passwordConfirmation)) {
+            loginFormState.setValue(new LoginFormState(null, null, R.string.password_confirmation_failed));
         } else {
             loginFormState.setValue(new LoginFormState(true));
         }

@@ -118,7 +118,7 @@ public class LoginFragment extends Fragment {
                 if(loginViewModel.login(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString())){
                     NavHostFragment.findNavController(LoginFragment.this)
-                            .navigate(R.id.action_loginFragment_to_signUpFragment);
+                            .navigate(R.id.action_loginFragment_to_signUpFragment); //TODO: update action
                 }
 
             }

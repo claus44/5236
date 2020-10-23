@@ -44,6 +44,7 @@ public class SignUpFragment extends Fragment {
 
         final EditText usernameEditText = view.findViewById(R.id.username);
         final EditText passwordEditText = view.findViewById(R.id.password);
+        final EditText passwordConfirmationEditText = view.findViewById(R.id.passwordConfirmation);
         final Button signUpButton = view.findViewById(R.id.signup);
         final Button loginButton = view.findViewById(R.id.login);
         final ProgressBar loadingProgressBar = view.findViewById(R.id.loading);
@@ -60,6 +61,9 @@ public class SignUpFragment extends Fragment {
                 }
                 if (loginFormState.getPasswordError() != null) {
                     passwordEditText.setError(getString(loginFormState.getPasswordError()));
+                }
+                if (loginFormState.getPasswordConfirmationError() != null) {
+                    passwordConfirmationEditText.setError(getString(loginFormState.getPasswordConfirmationError()));
                 }
             }
         });
@@ -99,13 +103,15 @@ public class SignUpFragment extends Fragment {
         };
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
+        passwordConfirmationEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    signUpViewModel.login(usernameEditText.getText().toString(),
-                            passwordEditText.getText().toString());
+                    signUpViewModel.register(usernameEditText.getText().toString(),
+                            passwordEditText.getText().toString(),
+                            passwordConfirmationEditText.getText().toString());
                 }
                 return false;
             }
@@ -115,8 +121,12 @@ public class SignUpFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                signUpViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString());
+                if (signUpViewModel.register(usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString(),
+                        passwordConfirmationEditText.getText().toString())) {
+                    NavHostFragment.findNavController(SignUpFragment.this)
+                            .navigate(R.id.action_loginFragment_to_signUpFragment); //TODO: update action
+                }
             }
         });
 
@@ -131,7 +141,7 @@ public class SignUpFragment extends Fragment {
 
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
+        // TODO : initiate successful sign up in experience
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(getContext().getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         }
