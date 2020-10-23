@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "223012855874",
+    "firebase_url": "https://columbus-sights---cse5236.firebaseio.com",
+    "project_id": "columbus-sights---cse5236",
+    "storage_bucket": "columbus-sights---cse5236.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:223012855874:android:0cc67cb6ec78d81b27cddb",
+        "android_client_info": {
+          "package_name": "com.example.a5236"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "223012855874-f0r90mq6463prcafbqru8c8e7nbcdp9h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDN9LZ_Joasg9mYhFsTEa990z09KqiEcyI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "223012855874-f0r90mq6463prcafbqru8c8e7nbcdp9h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
