@@ -125,7 +125,7 @@ public class SignUpFragment extends Fragment {
                         passwordEditText.getText().toString(),
                         passwordConfirmationEditText.getText().toString())) {
                     NavHostFragment.findNavController(SignUpFragment.this)
-                            .navigate(R.id.action_loginFragment_to_signUpFragment); //TODO: update action
+                            .navigate(R.id.action_signUpFragment_to_landmarkActivity); //TODO: update action
                 }
             }
         });
