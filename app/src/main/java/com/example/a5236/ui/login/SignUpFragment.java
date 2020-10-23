@@ -47,6 +47,8 @@ public class SignUpFragment extends Fragment {
         final EditText passwordConfirmationEditText = view.findViewById(R.id.passwordConfirmation);
         final Button signUpButton = view.findViewById(R.id.signup);
         final Button loginButton = view.findViewById(R.id.login);
+        final Button updatePassword = view.findViewById(R.id.update_password);
+        final Button deleteUser = view.findViewById(R.id.deleteUser);
         final ProgressBar loadingProgressBar = view.findViewById(R.id.loading);
 
         signUpViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
@@ -135,6 +137,32 @@ public class SignUpFragment extends Fragment {
             public void onClick(View v) {
                 NavHostFragment.findNavController(SignUpFragment.this)
                         .navigate(R.id.action_signUpFragment_to_loginFragment);
+            }
+        });
+
+        updatePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingProgressBar.setVisibility(View.VISIBLE);
+                if (signUpViewModel.updatePassword(usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString(),
+                        passwordConfirmationEditText.getText().toString())) {
+                    NavHostFragment.findNavController(SignUpFragment.this)
+                            .navigate(R.id.action_signUpFragment_to_loginFragment); //TODO: update action
+                }
+            }
+        });
+
+        deleteUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingProgressBar.setVisibility(View.VISIBLE);
+                if (signUpViewModel.deleteUser(usernameEditText.getText().toString(),
+                        passwordEditText.getText().toString(),
+                        passwordConfirmationEditText.getText().toString())) {
+                    NavHostFragment.findNavController(SignUpFragment.this)
+                            .navigate(R.id.action_signUpFragment_to_loginFragment); //TODO: update action
+                }
             }
         });
     }

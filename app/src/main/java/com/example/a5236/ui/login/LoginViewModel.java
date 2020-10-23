@@ -45,7 +45,7 @@ public class LoginViewModel extends ViewModel {
 
     public boolean register(String username, String password, String passwordConfirmation) {
         // can be launched in a separate asynchronous job
-        if(!password.equals(passwordConfirmation)) {
+        if (!password.equals(passwordConfirmation)) {
             loginResult.setValue(new LoginResult(R.string.password_confirmation_failed));
             return false;
         } else {
@@ -59,6 +59,24 @@ public class LoginViewModel extends ViewModel {
                 loginResult.setValue(new LoginResult(R.string.registration_failed));
                 return false;
             }
+        }
+    }
+
+    public boolean updatePassword(String username, String password, String passwordConfirmation) {
+        // can be launched in a separate asynchronous job
+        if (!password.equals(passwordConfirmation)) {
+            loginResult.setValue(new LoginResult(R.string.password_confirmation_failed));
+            return false;
+        } else {
+            loginRepository.updatePassword(username, password);
+//
+//            if (result instanceof Result.Success) {
+//                LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
+//                loginResult.setValue(new LoginResult(new LoggedInUserView(data.getUserId())));
+            return true;
+//            } else {
+//                loginResult.setValue(new LoginResult(R.string.registration_failed));
+//                return false;
         }
     }
 
@@ -99,5 +117,15 @@ public class LoginViewModel extends ViewModel {
     // A placeholder password validation check
     private boolean isPasswordValid(String password) {
         return password != null && password.trim().length() > 5;
+    }
+
+    public boolean deleteUser(String username, String password, String passwordConfirmation) {
+        if (!password.equals(passwordConfirmation)) {
+            loginResult.setValue(new LoginResult(R.string.password_confirmation_failed));
+            return false;
+        } else {
+            loginRepository.deleteUser(username, password);
+            return true;
+        }
     }
 }

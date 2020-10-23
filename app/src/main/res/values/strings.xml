@@ -23,4 +23,6 @@
     <string name="login_failed">Login failed</string>
     <string name="registration_failed">Account creation failed</string>
     <string name="password_confirmation_failed">Password does not match</string>
+    <string name="delete_user">Delete User</string>
+    <string name="update_password">Update Password</string>
 </resources>

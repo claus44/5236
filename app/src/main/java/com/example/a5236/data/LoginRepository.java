@@ -60,4 +60,13 @@ public class LoginRepository {
         }
         return result;
     }
+
+    public void updatePassword(String username, String password) {
+        // handle register
+        dataSource.updatePassword(username, password);
+    }
+
+    public void deleteUser(String username, String password) {
+        dataSource.deleteUser(username, password);
+    }
 }

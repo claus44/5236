@@ -121,4 +121,15 @@ public class LoginDataSource {
         }
         creation = !userExists;
     }
+
+    public void updatePassword(String username, String password) {
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        Account account = new Account(username, password, 0);
+        mDatabase.child("Accounts").child(username).setValue(account);
+    }
+
+    public void deleteUser(String username, String password) {
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("Accounts").child(username).removeValue();
+    }
 }
