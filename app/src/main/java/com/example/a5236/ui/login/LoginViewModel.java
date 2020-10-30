@@ -61,6 +61,19 @@ public class LoginViewModel extends ViewModel {
             }
         }
     }
+    public void register(boolean passwordMatch, LoggedInUser data, boolean userCreated){
+        if(passwordMatch){
+            loginResult.setValue(new LoginResult(R.string.password_confirmation_failed));
+        }else{
+            if(userCreated){
+                loginResult.setValue(new LoginResult(new LoggedInUserView(data.getUserId())));
+                loginRepository.register(userCreated,data);
+            }else{
+                loginResult.setValue(new LoginResult(R.string.registration_failed));
+                loginRepository.register(userCreated,data);
+            }
+        }
+    }
 
     public boolean updatePassword(String username, String password, String passwordConfirmation) {
         // can be launched in a separate asynchronous job

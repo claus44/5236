@@ -60,6 +60,11 @@ public class LoginRepository {
         }
         return result;
     }
+    public void register(boolean userExists,LoggedInUser data){
+        if(userExists) {
+            setLoggedInUser(data);
+        }
+    }
 
     public void updatePassword(String username, String password) {
         // handle register

@@ -11,6 +11,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +23,26 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.a5236.Account;
+import com.example.a5236.LandmarkActivity;
+import com.example.a5236.LoginActivity;
 import com.example.a5236.R;
+import com.example.a5236.data.model.LoggedInUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 public class SignUpFragment extends Fragment {
 
     private LoginViewModel signUpViewModel;
+    private FirebaseDatabase database;
+    private DatabaseReference mDatabase;
+    private LoggedInUser user;
+    private static final String TAG = "SignUpFragment";
 
     @Nullable
     @Override
@@ -123,11 +139,38 @@ public class SignUpFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
-                if (signUpViewModel.register(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString(),
-                        passwordConfirmationEditText.getText().toString())) {
-                    NavHostFragment.findNavController(SignUpFragment.this)
-                            .navigate(R.id.action_signUpFragment_to_landmarkActivity); //TODO: update action
+                final String username = usernameEditText.getText().toString();
+                final String password = passwordEditText.getText().toString();
+                String passwordConfirm = passwordConfirmationEditText.getText().toString();
+
+//                if (signUpViewModel.register(usernameEditText.getText().toString(),
+//                        passwordEditText.getText().toString(),
+//                        passwordConfirmationEditText.getText().toString())) {
+//                    NavHostFragment.findNavController(SignUpFragment.this)
+//                            .navigate(R.id.action_signUpFragment_to_landmarkActivity); //TODO: update action
+//                }
+                if(password.equals(passwordConfirm)){
+                    mDatabase = FirebaseDatabase.getInstance().getReference();
+                    user = new LoggedInUser(username);
+                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            boolean userExists = checkUsernameExists(snapshot, username, password);
+                            if(!userExists){
+                                signUpViewModel.register(false, user, true);
+                                NavHostFragment.findNavController(SignUpFragment.this)
+                                    .navigate(R.id.action_signUpFragment_to_landmarkActivity);
+                            }else{
+                                signUpViewModel.register(false, user, false);
+                                loadingProgressBar.setVisibility(View.GONE);
+//                                Toast.makeText((LoginActivity) getActivity(),"Username already taken",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) { }
+                    });
+                }else{
+                    signUpViewModel.register(true, user, false);
                 }
             }
         });
@@ -182,5 +225,19 @@ public class SignUpFragment extends Fragment {
                     errorString,
                     Toast.LENGTH_LONG).show();
         }
+    }
+    private boolean checkUsernameExists(DataSnapshot dataSnapshot, String username, String password) {
+        boolean userExists = false;
+        for (DataSnapshot ds : dataSnapshot.getChildren()){
+            if (ds.getKey().equals("Accounts")){
+                HashMap<String, Object> hm = (HashMap<String, Object>) ds.getValue();
+                userExists = hm.containsKey(username);
+            }
+        }
+        if (!userExists) {
+            Account account = new Account(username, password, 0);
+            mDatabase.child("Accounts").child(account.getUsername()).setValue(account);
+        }
+        return userExists;
     }
 }
