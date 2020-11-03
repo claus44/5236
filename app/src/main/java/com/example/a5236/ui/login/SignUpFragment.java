@@ -140,31 +140,35 @@ public class SignUpFragment extends Fragment {
             }
         });
 
-        updatePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                if (signUpViewModel.updatePassword(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString(),
-                        passwordConfirmationEditText.getText().toString())) {
-                    NavHostFragment.findNavController(SignUpFragment.this)
-                            .navigate(R.id.action_signUpFragment_to_loginFragment); //TODO: update action
-                }
-            }
-        });
+        //TODO: Move to new home
 
-        deleteUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                if (signUpViewModel.deleteUser(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString(),
-                        passwordConfirmationEditText.getText().toString())) {
-                    NavHostFragment.findNavController(SignUpFragment.this)
-                            .navigate(R.id.action_signUpFragment_to_loginFragment); //TODO: update action
-                }
-            }
-        });
+//        updatePassword.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                loadingProgressBar.setVisibility(View.VISIBLE);
+//                if (signUpViewModel.updatePassword(usernameEditText.getText().toString(),
+//                        passwordEditText.getText().toString(),
+//                        passwordConfirmationEditText.getText().toString())) {
+//                    NavHostFragment.findNavController(SignUpFragment.this)
+//                            .navigate(R.id.action_signUpFragment_to_loginFragment); //TODO: update action
+//                }
+//            }
+//        });
+
+//TODO: move to new home
+
+//        deleteUser.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                loadingProgressBar.setVisibility(View.VISIBLE);
+//                if (signUpViewModel.deleteUser(usernameEditText.getText().toString(),
+//                        passwordEditText.getText().toString(),
+//                        passwordConfirmationEditText.getText().toString())) {
+//                    NavHostFragment.findNavController(SignUpFragment.this)
+//                            .navigate(R.id.action_signUpFragment_to_loginFragment); //TODO: update action
+//                }
+//            }
+//        });
     }
 
     private void updateUiWithUser(LoggedInUserView model) {

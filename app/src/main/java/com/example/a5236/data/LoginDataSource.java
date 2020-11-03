@@ -30,7 +30,6 @@ public class LoginDataSource {
 
 
     public Result<LoggedInUser> login(String username, String password) {
-
         try {
             mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -55,7 +54,7 @@ public class LoginDataSource {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         try {
             user = new LoggedInUser(username);
-            registerFirebase(username, password);
+            //registerFirebase(username, password);
             mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -68,7 +67,7 @@ public class LoginDataSource {
 
                 }
             });
-
+            Thread.sleep(1000);
 //TODO: find a better solution/make it work
             if (creation) {Log.d(TAG, "#########after listener##########");
                 return new Result.Success<>(user);

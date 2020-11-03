@@ -6,6 +6,7 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="profile">Profile</string>
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
@@ -25,4 +26,9 @@
     <string name="password_confirmation_failed">Password does not match</string>
     <string name="delete_user">Delete User</string>
     <string name="update_password">Update Password</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="landmark_title">Title</string>
+    <string name="landmark_description">Description</string>
+    <string name="landmark_found_btn">Found it!</string>
+    <string name="landmark_hint_btn">Hint?</string>
 </resources>
