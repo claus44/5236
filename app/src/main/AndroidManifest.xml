@@ -13,8 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".LandmarkActivity">
-            <nav-graph>
-            </nav-graph>
+
         </activity>
         <activity
             android:name=".LoginActivity"
