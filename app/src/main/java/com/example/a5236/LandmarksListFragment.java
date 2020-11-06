@@ -48,7 +48,8 @@ public class LandmarksListFragment extends Fragment {
         // method to replace later with Firebase linked data
         prepareLandmarkData();
 
-        final LandmarkActivity mContext = (LandmarkActivity) getActivity();
+        //final LandmarkActivity mContext = (LandmarkActivity) getActivity();
+        final LoginActivity mContext = (LoginActivity) getActivity();
         listAdapter = new LandmarkListAdapter(mContext, landmarkGroupList, landmarkItemList);
         expListView.setAdapter(listAdapter);
         // Click Listeners
@@ -90,12 +91,13 @@ public class LandmarksListFragment extends Fragment {
             }
         });
 
+        //TODO: Update navigate action to profile page.
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 NavHostFragment.findNavController(LandmarksListFragment.this)
                         .navigate(R.id.action_landmarksListFragment_to_landmarkFragment);
-                //TODO: Update navigate action to profile page.
+
             }
         });
     }

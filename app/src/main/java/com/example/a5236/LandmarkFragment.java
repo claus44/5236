@@ -82,16 +82,16 @@ public class LandmarkFragment extends Fragment {
                              Bundle savedInstanceState) {
 
 
-        final Button foundButton = getView().findViewById(R.id.landmark_found);
-        final Button hintButton = getView().findViewById(R.id.landmark_hint);
-        final ImageView landmarkImg = getView().findViewById(R.id.landmark_img);
-        final TextView landmarkTitle = getView().findViewById(R.id.landmark_title);
-        final TextView landmarkDescription = getView().findViewById(R.id.landmark_description);
-
-        //landmarkImg.setImageURI((Uri) LandmarkActivity.currentLandmark.getImage());
-        // TODO: figure out how to handle images
-        landmarkTitle.setText(landmark.getTitle());
-        landmarkDescription.setText(landmark.getDescription());
+//        final Button foundButton = getView().findViewById(R.id.landmark_found);
+//        final Button hintButton = getView().findViewById(R.id.landmark_hint);
+//        final ImageView landmarkImg = getView().findViewById(R.id.landmark_img);
+//        final TextView landmarkTitle = getView().findViewById(R.id.landmark_title);
+//        final TextView landmarkDescription = getView().findViewById(R.id.landmark_description);
+//
+//        //landmarkImg.setImageBitmap((Uri) LandmarkActivity.currentLandmark.getImage());
+//        // TODO: figure out how to handle images
+//        landmarkTitle.setText(landmark.getTitle());
+//        landmarkDescription.setText(landmark.getDescription());
 
 //        foundButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -109,6 +109,22 @@ public class LandmarkFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_landmark, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+
+        final Button foundButton = getView().findViewById(R.id.landmark_found);
+        final Button hintButton = getView().findViewById(R.id.landmark_hint);
+        final ImageView landmarkImg = getView().findViewById(R.id.landmark_img);
+        final TextView landmarkTitle = getView().findViewById(R.id.landmark_title);
+        final TextView landmarkDescription = getView().findViewById(R.id.landmark_description);
+
+        //landmarkImg.setImageBitmap((Uri) LandmarkActivity.currentLandmark.getImage());
+        // TODO: figure out how to handle images
+        landmarkTitle.setText(landmark.getTitle());
+        landmarkDescription.setText(landmark.getDescription());
+
     }
 
 
