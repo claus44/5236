@@ -40,11 +40,6 @@
             android:id="@+id/action_landmarksListFragment_to_landmarkFragment"
             app:destination="@id/landmarkFragment" />
     </fragment>
-    <activity
-        android:id="@+id/landmarkActivity"
-        android:name="com.example.a5236.LandmarkActivity"
-        android:label="activity_landmark"
-        tools:layout="@layout/activity_landmark" />
     <fragment
         android:id="@+id/landmarkFragment"
         android:name="com.example.a5236.LandmarkFragment"

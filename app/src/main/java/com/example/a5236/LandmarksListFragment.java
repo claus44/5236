@@ -77,11 +77,12 @@ public class LandmarksListFragment extends Fragment {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
-                if (groupPosition == 0){
-                    LandmarkActivity.setCurrentLandmark(landmarkItemList.get(notFound).get(childPosition));
-                } else {
-                    LandmarkActivity.setCurrentLandmark(landmarkItemList.get(Found).get(childPosition));
-                }
+                LoginActivity.setCurrentLandmark((Landmark) listAdapter.getChild(groupPosition, childPosition));
+//                if (groupPosition == 0){
+//                    LandmarkActivity.setCurrentLandmark(landmarkItemList.get(notFound).get(childPosition));
+//                } else {
+//                    LandmarkActivity.setCurrentLandmark(landmarkItemList.get(Found).get(childPosition));
+//                }
 
                 NavHostFragment.findNavController(LandmarksListFragment.this)
                         .navigate(R.id.action_landmarksListFragment_to_landmarkFragment);

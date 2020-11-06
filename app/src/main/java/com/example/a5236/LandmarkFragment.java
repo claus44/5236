@@ -40,7 +40,7 @@ public class LandmarkFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private static Landmark landmark = LandmarkActivity.getCurrentLandmark();
+    private static Landmark landmark = LoginActivity.getCurrentLandmark();
     //final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
