@@ -1,5 +1,7 @@
 package com.example.a5236;
 
+import android.net.Uri;
+
 import java.util.List;
 
 public class Landmark {

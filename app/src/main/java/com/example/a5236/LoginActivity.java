@@ -14,6 +14,15 @@ import android.view.View;
 public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
+    public static Landmark currentLandmark;
+
+    public static void setCurrentLandmark(Landmark landmark){
+        currentLandmark = landmark;
+    }
+
+    public static Landmark getCurrentLandmark() {
+        return currentLandmark;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

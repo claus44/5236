@@ -8,13 +8,13 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,8 @@ import java.util.List;
 public class LandmarksListFragment extends Fragment {
 
     private static final String TAG = "LandmarksListFragment";
+    private static final String notFound = "Not Found";
+    private static final String Found = "Found";
     Context mContext;
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
@@ -38,12 +40,16 @@ public class LandmarksListFragment extends Fragment {
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+
+        final Button profileButton = view.findViewById(R.id.profile);
+
         super.onViewCreated(view, savedInstanceState);
         expListView = (ExpandableListView) view.findViewById(R.id.landmarksExpList);
         // method to replace later with Firebase linked data
         prepareLandmarkData();
 
-        final LandmarkActivity mContext = (LandmarkActivity) getActivity();
+        //final LandmarkActivity mContext = (LandmarkActivity) getActivity();
+        final LoginActivity mContext = (LoginActivity) getActivity();
         listAdapter = new LandmarkListAdapter(mContext, landmarkGroupList, landmarkItemList);
         expListView.setAdapter(listAdapter);
         // Click Listeners
@@ -71,8 +77,28 @@ public class LandmarksListFragment extends Fragment {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
+                LoginActivity.setCurrentLandmark((Landmark) listAdapter.getChild(groupPosition, childPosition));
+//                if (groupPosition == 0){
+//                    LandmarkActivity.setCurrentLandmark(landmarkItemList.get(notFound).get(childPosition));
+//                } else {
+//                    LandmarkActivity.setCurrentLandmark(landmarkItemList.get(Found).get(childPosition));
+//                }
+
+                NavHostFragment.findNavController(LandmarksListFragment.this)
+                        .navigate(R.id.action_landmarksListFragment_to_landmarkFragment);
+                //TODO: pass landmark clicked on
                 Log.d(TAG, "CHILD CLICK LISTENER TODO");
                 return false;
+            }
+        });
+
+        //TODO: Update navigate action to profile page.
+        profileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavHostFragment.findNavController(LandmarksListFragment.this)
+                        .navigate(R.id.action_landmarksListFragment_to_landmarkFragment);
+
             }
         });
     }
