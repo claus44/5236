@@ -11,16 +11,16 @@ public class Landmark {
     private String coordinates;
     private String image;
     private String description;
-    private List<String> hints;
+    private String hint;
     private Account createdBy;
 
-    public Landmark(String title, int difficulty, String coordinates, String image, String description, List<String> hints, Account createdBy) {
+    public Landmark(String title, int difficulty, String coordinates, String image, String description, String hint, Account createdBy) {
         this.title = title;
         this.difficulty = difficulty;
         this.coordinates = coordinates;
         this.image = image;
         this.description = description;
-        this.hints = hints;
+        this.hint = hint;
         this.createdBy = createdBy;
     }
 
@@ -64,13 +64,9 @@ public class Landmark {
         this.description = description;
     }
 
-    public List<String> getHints() {
-        return hints;
-    }
+    public String getHint() { return hint; }
 
-    public void setHints(List<String> hints) {
-        this.hints = hints;
-    }
+    public void setHint(String hint) { this.hint = hint; }
 
     public Account getCreatedBy() {
         return createdBy;

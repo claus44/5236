@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a5236.Account;
+import com.example.a5236.Landmark;
 import com.example.a5236.LandmarkActivity;
 import com.example.a5236.LoginActivity;
 import com.example.a5236.R;
@@ -150,6 +151,7 @@ public class SignUpFragment extends Fragment {
                             boolean userExists = checkUsernameExists(snapshot, username, password);
                             if(!userExists){
                                 signUpViewModel.register(true, user, true);
+                                LoginActivity.setLoggedInUser(user);
                                 NavHostFragment.findNavController(SignUpFragment.this)
                                     .navigate(R.id.action_signUpFragment_to_landmarkActivity);
                             }else{

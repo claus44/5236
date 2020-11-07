@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a5236.Account;
+import com.example.a5236.LoginActivity;
 import com.example.a5236.R;
 import com.example.a5236.data.model.LoggedInUser;
 import com.google.firebase.database.DataSnapshot;
@@ -137,6 +138,7 @@ public class LoginFragment extends Fragment {
                         boolean loginCorrect = checkUsernameAndPassword(snapshot, username, password);
                         if(loginCorrect){
                             loginViewModel.login(loginCorrect, user);
+                            LoginActivity.setLoggedInUser(user);
                             NavHostFragment.findNavController(LoginFragment.this)
                             .navigate(R.id.action_loginFragment_to_landmarkActivity);
                         }else{

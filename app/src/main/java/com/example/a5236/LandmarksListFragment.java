@@ -1,12 +1,17 @@
 package com.example.a5236;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -15,6 +20,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +38,8 @@ public class LandmarksListFragment extends Fragment {
     List<String> landmarkGroupList;
     HashMap<String, List<Landmark>> landmarkItemList;
 
+    private static final int Image_Capture_Code = 1;
+    ImageView mImageView;
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -42,13 +51,12 @@ public class LandmarksListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 
         final Button profileButton = view.findViewById(R.id.profile);
-
+        final Button cameraButton = view.findViewById(R.id.camera);
         super.onViewCreated(view, savedInstanceState);
         expListView = (ExpandableListView) view.findViewById(R.id.landmarksExpList);
         // method to replace later with Firebase linked data
         prepareLandmarkData();
 
-        //final LandmarkActivity mContext = (LandmarkActivity) getActivity();
         final LoginActivity mContext = (LoginActivity) getActivity();
         listAdapter = new LandmarkListAdapter(mContext, landmarkGroupList, landmarkItemList);
         expListView.setAdapter(listAdapter);
@@ -78,11 +86,6 @@ public class LandmarksListFragment extends Fragment {
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
                 LoginActivity.setCurrentLandmark((Landmark) listAdapter.getChild(groupPosition, childPosition));
-//                if (groupPosition == 0){
-//                    LandmarkActivity.setCurrentLandmark(landmarkItemList.get(notFound).get(childPosition));
-//                } else {
-//                    LandmarkActivity.setCurrentLandmark(landmarkItemList.get(Found).get(childPosition));
-//                }
 
                 NavHostFragment.findNavController(LandmarksListFragment.this)
                         .navigate(R.id.action_landmarksListFragment_to_landmarkFragment);
@@ -101,7 +104,29 @@ public class LandmarksListFragment extends Fragment {
 
             }
         });
+        cameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cInt = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cInt,Image_Capture_Code);
+            }
+        });
     }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Image_Capture_Code) {
+            if (resultCode == Activity.RESULT_OK) {
+                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                LoginActivity.setCurrentBitmap(bitmap);
+                NavHostFragment.findNavController(LandmarksListFragment.this)
+                        .navigate(R.id.action_landmarksListFragment_to_addLandmarkFragment);
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     // method to initialize landmark list
     private void prepareLandmarkData(){
         landmarkGroupList = new ArrayList<String>();

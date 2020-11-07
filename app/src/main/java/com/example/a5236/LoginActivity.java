@@ -1,7 +1,9 @@
 package com.example.a5236;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import com.example.a5236.data.model.LoggedInUser;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -15,11 +17,18 @@ public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
     public static Landmark currentLandmark;
+    public static Bitmap currentBitmap;
+    public static LoggedInUser loggedInUser;
+
+    public static void setLoggedInUser(LoggedInUser user){ loggedInUser = user;}
+    public static LoggedInUser getLoggedInUser() { return loggedInUser;}
+
+    public static void setCurrentBitmap(Bitmap bitmap){ currentBitmap = bitmap;}
+    public static Bitmap getCurrentBitmap() { return currentBitmap;}
 
     public static void setCurrentLandmark(Landmark landmark){
         currentLandmark = landmark;
     }
-
     public static Landmark getCurrentLandmark() {
         return currentLandmark;
     }

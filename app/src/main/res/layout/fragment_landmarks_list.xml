@@ -13,11 +13,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/profile" />
+    <Button
+        android:id="@+id/camera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/camera" />
+
 
     <ExpandableListView
         android:id="@+id/landmarksExpList"
         android:layout_width="match_parent"
-        android:layout_height="641dp">
+        android:layout_height="500dp">
 
     </ExpandableListView>
 
