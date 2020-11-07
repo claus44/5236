@@ -1,11 +1,16 @@
 package com.example.a5236;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -22,8 +27,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -49,6 +58,9 @@ public class AddLandmarkFragment extends Fragment {
     Button createLandmarkBtn, retryBtn, backBtn;
     ProgressBar loadingProgressBar;
     LoginActivity mContext;
+
+    FusedLocationProviderClient fusedLocationProviderClient;
+    private String coordinates;
 
     public AddLandmarkFragment() {
         // Required empty public constructor
@@ -81,10 +93,14 @@ public class AddLandmarkFragment extends Fragment {
 
         mContext = (LoginActivity) getActivity();
 
+        //Initialize fusedLocationProviderClient
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mContext);
+
         titleEditText.addTextChangedListener(txtWatcher);
         descriptionEditText.addTextChangedListener(txtWatcher);
         hintEditText.addTextChangedListener(txtWatcher);
         difficultyEditText.addTextChangedListener(txtWatcher);
+
 
         mImageView.setImageBitmap(LoginActivity.getCurrentBitmap());
 
@@ -109,23 +125,35 @@ public class AddLandmarkFragment extends Fragment {
             @Override
             public void onClick(View v) {
 //                loadingProgressBar.setVisibility(View.VISIBLE);
-                final String title = titleEditText.getText().toString();
-                final String desc = descriptionEditText.getText().toString();
-                final String hint = hintEditText.getText().toString();
-                final int difficulty = Integer.parseInt(difficultyEditText.getText().toString());
-                mDatabase = FirebaseDatabase.getInstance().getReference();
-               //  add get GPS coordinates
-                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            final String title = titleEditText.getText().toString();
+            final String desc = descriptionEditText.getText().toString();
+            final String hint = hintEditText.getText().toString();
+            final int difficulty = Integer.parseInt(difficultyEditText.getText().toString());
+            if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
+                fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        tryCreateLandmark(snapshot, title, difficulty, desc, hint);
+                    public void onComplete(@NonNull Task<Location> task) {
+                        Location location = task.getResult();
+                        if(location != null){
+                            Double latitude = location.getLatitude();
+                            Double longtitude = location.getLongitude();
+                            coordinates = longtitude + "," + latitude;
+                            mDatabase = FirebaseDatabase.getInstance().getReference();
+                            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    tryCreateLandmark(snapshot, title, difficulty, desc, hint);
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) { }
+                            });
+                        }
                     }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) { }
                 });
-
-
-
+            }else{
+                // permission denied
+                ActivityCompat.requestPermissions(mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION} , 44);
+            }
             }
         });
 
@@ -210,7 +238,7 @@ public class AddLandmarkFragment extends Fragment {
                     String imageRef = "images/" + title;
                     List<String> foundByUsers = new ArrayList<String>();
                     foundByUsers.add(LoginActivity.getLoggedInUser().getUserId());
-                    Landmark landmark = new Landmark(title, diff, "coord", imageRef, desc, hint, LoginActivity.getLoggedInUser().getUserId(), foundByUsers);
+                    Landmark landmark = new Landmark(title, diff, coordinates, imageRef, desc, hint, LoginActivity.getLoggedInUser().getUserId(), foundByUsers);
                     mDatabase.child("Landmarks").child(title).setValue(landmark);
                     updateLandmarkList(landmark);
                     Toast.makeText(getContext().getApplicationContext(), "Landmark Successfully Created", Toast.LENGTH_LONG).show();
