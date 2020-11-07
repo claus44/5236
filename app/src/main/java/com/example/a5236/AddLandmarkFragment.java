@@ -22,20 +22,27 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.example.a5236.ui.login.SignUpFragment;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class AddLandmarkFragment extends Fragment {
     private static final String TAG = "AddLandmarkFragment";
     private static final int Image_Capture_Code = 1;
+    private StorageReference mStorageRef;
     private DatabaseReference mDatabase;
     ImageView mImageView;
     EditText titleEditText,descriptionEditText, hintEditText, difficultyEditText;
@@ -105,23 +112,17 @@ public class AddLandmarkFragment extends Fragment {
                 final String title = titleEditText.getText().toString();
                 final String desc = descriptionEditText.getText().toString();
                 final String hint = hintEditText.getText().toString();
+                final int difficulty = Integer.parseInt(difficultyEditText.getText().toString());
                 mDatabase = FirebaseDatabase.getInstance().getReference();
-                // add get GPS coordinates
-//                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                        boolean landmarkCreated = tryCreateLandmark(snapshot, title, desc, hint);
-//                        if(!landmarkCreated){
-//
-//                            NavHostFragment.findNavController(AddLandmarkFragment.this)
-//                                    .navigate(R.id.action_addLandmarkFragment_to_landmarksListFragment);
-//                        }else{
-//                            loadingProgressBar.setVisibility(View.GONE);
-//                        }
-//                    }
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) { }
-//                });
+               //  add get GPS coordinates
+                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        tryCreateLandmark(snapshot, title, difficulty, desc, hint);
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) { }
+                });
 
 
 
@@ -188,7 +189,42 @@ public class AddLandmarkFragment extends Fragment {
         }
     }
 
-    public boolean tryCreateLandmark(DataSnapshot dataSnapshot, String title, String desc, String hint){
+    public void tryCreateLandmark(DataSnapshot dataSnapshot, final String title, final int diff, final String desc, final String hint){
+        boolean landmarkExists = checkTitleExists(dataSnapshot,title);
+        if (!landmarkExists) {
+            byte[] data = covertBitmapToStoreInFirebase(LoginActivity.getCurrentBitmap());
+            mStorageRef = FirebaseStorage.getInstance().getReference();
+            StorageReference fileStorageRef = mStorageRef.child("images/" + title);
+            UploadTask uploadTask = fileStorageRef.putBytes(data);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    loadingProgressBar.setVisibility(View.GONE);
+                    Toast.makeText(getContext().getApplicationContext(), "Failed to create landmark", Toast.LENGTH_LONG).show();
+
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    String imageRef = "images/" + title;
+                    List<String> foundByUsers = new ArrayList<String>();
+                    foundByUsers.add(LoginActivity.getLoggedInUser().getUserId());
+                    Landmark landmark = new Landmark(title, diff, "coord", imageRef, desc, hint, LoginActivity.getLoggedInUser().getUserId(), foundByUsers);
+                    mDatabase.child("Landmarks").child(title).setValue(landmark);
+                    updateLandmarkList(landmark);
+                    Toast.makeText(getContext().getApplicationContext(), "Landmark Successfully Created", Toast.LENGTH_LONG).show();
+                    NavHostFragment.findNavController(AddLandmarkFragment.this)
+                                    .navigate(R.id.action_addLandmarkFragment_to_landmarksListFragment);
+                }
+            });
+
+        }else{
+            loadingProgressBar.setVisibility(View.GONE);
+            Toast.makeText(getContext().getApplicationContext(), "Landmark Title Already Exists", Toast.LENGTH_LONG).show();
+        }
+    }
+    private boolean checkTitleExists(DataSnapshot dataSnapshot, final String title){
         boolean landmarkExists = false;
         for (DataSnapshot ds : dataSnapshot.getChildren()){
             if (ds.getKey().equals("Landmarks")){
@@ -196,11 +232,21 @@ public class AddLandmarkFragment extends Fragment {
                 landmarkExists = hm.containsKey(title);
             }
         }
-        if (!landmarkExists) {
-//            Landmark landmark = new Landmark()
-//            mDatabase.child("Landmarks").child(account.getUsername()).setValue(account);
-        }
         return landmarkExists;
     }
 
+    private void updateLandmarkList(Landmark landmark){
+        HashMap<String, List<Landmark>> currentLandmarks = LoginActivity.getLandmarkItemList();
+        List<Landmark> currentFound = currentLandmarks.get("Found");
+        currentFound.add(landmark);
+        currentLandmarks.put("Found", currentFound);
+        LoginActivity.setLandmarkItemList(currentLandmarks);
+    }
+
+    public byte[] covertBitmapToStoreInFirebase(Bitmap bitmap){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+        return data;
+    }
 }

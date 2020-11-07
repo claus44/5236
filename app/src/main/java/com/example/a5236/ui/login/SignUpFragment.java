@@ -152,6 +152,7 @@ public class SignUpFragment extends Fragment {
                             if(!userExists){
                                 signUpViewModel.register(true, user, true);
                                 LoginActivity.setLoggedInUser(user);
+                                LoginActivity.retrieveLandmarkData(snapshot);
                                 NavHostFragment.findNavController(SignUpFragment.this)
                                     .navigate(R.id.action_signUpFragment_to_landmarkActivity);
                             }else{

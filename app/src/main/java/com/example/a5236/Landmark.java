@@ -2,6 +2,8 @@ package com.example.a5236;
 
 import android.net.Uri;
 
+import com.example.a5236.data.model.LoggedInUser;
+
 import java.util.List;
 
 public class Landmark {
@@ -12,9 +14,10 @@ public class Landmark {
     private String image;
     private String description;
     private String hint;
-    private Account createdBy;
+    private String createdBy;
+    private List<String> foundByUsers;
 
-    public Landmark(String title, int difficulty, String coordinates, String image, String description, String hint, Account createdBy) {
+    public Landmark(String title, int difficulty, String coordinates, String image, String description, String hint, String createdBy, List<String> foundByUsers) {
         this.title = title;
         this.difficulty = difficulty;
         this.coordinates = coordinates;
@@ -22,6 +25,7 @@ public class Landmark {
         this.description = description;
         this.hint = hint;
         this.createdBy = createdBy;
+        this.foundByUsers = foundByUsers;
     }
 
     public String getTitle() {
@@ -68,11 +72,15 @@ public class Landmark {
 
     public void setHint(String hint) { this.hint = hint; }
 
-    public Account getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Account createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
+
+    public List<String> getFoundByUsers() { return foundByUsers; }
+
+    public void setFoundByUsers(List<String> foundByUsers) { this.foundByUsers = foundByUsers; }
 }

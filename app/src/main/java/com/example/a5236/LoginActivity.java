@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.example.a5236.data.model.LoggedInUser;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.database.DataSnapshot;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -13,12 +14,18 @@ import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class LoginActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
     public static Landmark currentLandmark;
     public static Bitmap currentBitmap;
     public static LoggedInUser loggedInUser;
+    public static HashMap<String, List<Landmark>> landmarkItemList;
 
     public static void setLoggedInUser(LoggedInUser user){ loggedInUser = user;}
     public static LoggedInUser getLoggedInUser() { return loggedInUser;}
@@ -32,6 +39,11 @@ public class LoginActivity extends AppCompatActivity {
     public static Landmark getCurrentLandmark() {
         return currentLandmark;
     }
+
+    public static void setLandmarkItemList(HashMap<String, List<Landmark>> list){
+        landmarkItemList = list;
+    }
+    public static HashMap<String, List<Landmark>> getLandmarkItemList(){return landmarkItemList;}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,5 +91,35 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(TAG, "onDestroy()");
         super.onDestroy();
 
+    }
+
+    public static void retrieveLandmarkData(DataSnapshot dataSnapshot){
+        HashMap<String, List<Landmark>> landmarkList = new HashMap<String, List<Landmark>>();
+        //initialize group names
+
+        List<Landmark> notFound = new ArrayList<Landmark>();
+        List<Landmark> found = new ArrayList<Landmark>();
+
+        DataSnapshot landmarks = dataSnapshot.child("Landmarks");
+        HashMap<String, Object> hml = (HashMap<String, Object>) landmarks.getValue();
+        for(Map.Entry<String, Object> entry : hml.entrySet()){
+            HashMap<String, Object> landmarkObject = (HashMap<String, Object>) entry.getValue();
+            ArrayList<String> foundByUsers =  (ArrayList<String>) landmarkObject.get("foundByUsers");
+            // create landmark
+            Landmark landmark = new Landmark(landmarkObject.get("title").toString(),
+                    ((Long)landmarkObject.get("difficulty")).intValue(), landmarkObject.get("coordinates").toString(),
+                    landmarkObject.get("image").toString(), landmarkObject.get("description").toString(),
+                    landmarkObject.get("hint").toString(), landmarkObject.get("createdBy").toString(),
+                    foundByUsers);
+            if(foundByUsers.contains(LoginActivity.getLoggedInUser().getUserId())){
+                found.add(landmark);
+            }else{
+                notFound.add(landmark);
+            }
+        }
+
+        landmarkList.put("Not Found", notFound);
+        landmarkList.put("Found", found);
+        setLandmarkItemList(landmarkList);
     }
 }

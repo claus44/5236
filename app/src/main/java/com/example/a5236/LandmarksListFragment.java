@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,7 +12,6 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import android.provider.MediaStore;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +21,12 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LandmarksListFragment extends Fragment {
 
@@ -37,6 +38,8 @@ public class LandmarksListFragment extends Fragment {
     ExpandableListView expListView;
     List<String> landmarkGroupList;
     HashMap<String, List<Landmark>> landmarkItemList;
+
+    private DatabaseReference mDatabase;
 
     private static final int Image_Capture_Code = 1;
     ImageView mImageView;
@@ -54,8 +57,8 @@ public class LandmarksListFragment extends Fragment {
         final Button cameraButton = view.findViewById(R.id.camera);
         super.onViewCreated(view, savedInstanceState);
         expListView = (ExpandableListView) view.findViewById(R.id.landmarksExpList);
-        // method to replace later with Firebase linked data
-        prepareLandmarkData();
+
+        prepareLandmarkInfo();
 
         final LoginActivity mContext = (LoginActivity) getActivity();
         listAdapter = new LandmarkListAdapter(mContext, landmarkGroupList, landmarkItemList);
@@ -126,53 +129,11 @@ public class LandmarksListFragment extends Fragment {
             }
         }
     }
-
-    // method to initialize landmark list
-    private void prepareLandmarkData(){
+    private void prepareLandmarkInfo(){
         landmarkGroupList = new ArrayList<String>();
-        landmarkItemList = new HashMap<String, List<Landmark>>();
-
         landmarkGroupList.add("Not Found");
         landmarkGroupList.add("Found");
-
-        Landmark dummy1 = new Landmark("Dummy1", 2,"2","imageUrl", "Here is a small description. it can be longer or shorter", null, null);
-        Landmark dummy3 = new Landmark("Dummy3", 2,"2","imageUrl", "Here is a small description. it can be longer or shorter. Here is a small description. it can be longer or shorter", null, null);
-        Landmark dummy2 = new Landmark("Dummy2", 2,"2","imageUrl", "Here is a small description", null, null);
-
-        List<Landmark> notFound = new ArrayList<Landmark>();
-        notFound.add(dummy1);
-        notFound.add(dummy3);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy3);
-        notFound.add(dummy3);
-        notFound.add(dummy3);
-        notFound.add(dummy3);
-        notFound.add(dummy3);
-        notFound.add(dummy3);
-        notFound.add(dummy3);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-        notFound.add(dummy1);
-
-        List<Landmark> found = new ArrayList<Landmark>();
-        found.add(dummy2);
-
-        landmarkItemList.put(landmarkGroupList.get(0), notFound);
-        landmarkItemList.put(landmarkGroupList.get(1), found);
-
+        landmarkItemList = LoginActivity.getLandmarkItemList();
     }
 
 }

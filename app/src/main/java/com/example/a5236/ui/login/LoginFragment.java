@@ -139,6 +139,7 @@ public class LoginFragment extends Fragment {
                         if(loginCorrect){
                             loginViewModel.login(loginCorrect, user);
                             LoginActivity.setLoggedInUser(user);
+                            LoginActivity.retrieveLandmarkData(snapshot);
                             NavHostFragment.findNavController(LoginFragment.this)
                             .navigate(R.id.action_loginFragment_to_landmarkActivity);
                         }else{

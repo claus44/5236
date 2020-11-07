@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,6 +24,7 @@ public class LandmarkListAdapter extends BaseExpandableListAdapter {
     private Context mContext;
     private List<String> mLandmarkGroupTitleList;
     private HashMap<String, List<Landmark>> mLandmarkListGroupedItems;
+    private StorageReference mStorageRef;
 
     public LandmarkListAdapter(Context mContext, List<String> mLandmarkGroupTitleList, HashMap<String, List<Landmark>> mLandmarkListGroupedItems) {
         this.mContext = mContext;
@@ -84,15 +88,15 @@ public class LandmarkListAdapter extends BaseExpandableListAdapter {
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.landmark_list_item,  parent,false);
         }
-        //Change later with Firebase linked
         TextView tvLandmarkItemTitle = (TextView) convertView.findViewById(R.id.landmarkListItemTitle);
         tvLandmarkItemTitle.setText(landmarkItem.getTitle());
         TextView tvLandmarkItemDesc = (TextView) convertView.findViewById(R.id.landmarkListItemDescription);
         tvLandmarkItemDesc.setText(landmarkItem.getDescription());
-        ImageView ivLandmarkItemImage = (ImageView) convertView.findViewById(R.id.landmarkItemImage);
 
-        //Change later with Firebase linked
-        Glide.with(mContext).load("https://icons-for-free.com/iconfiles/png/512/file-131964752888364301.png").into(ivLandmarkItemImage);
+        ImageView ivLandmarkItemImage = (ImageView) convertView.findViewById(R.id.landmarkItemImage);
+        mStorageRef = FirebaseStorage.getInstance().getReference().child(landmarkItem.getImage());
+        GlideApp.with(mContext).load(mStorageRef).into(ivLandmarkItemImage);
+
         return convertView;
     }
 
