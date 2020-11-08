@@ -1,6 +1,10 @@
 package com.example.a5236;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.example.a5236.data.model.LoggedInUser;
@@ -10,10 +14,12 @@ import com.google.firebase.database.DataSnapshot;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 
 import android.util.Log;
 import android.view.View;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +32,15 @@ public class LoginActivity extends AppCompatActivity {
     public static Bitmap currentBitmap;
     public static LoggedInUser loggedInUser;
     public static HashMap<String, List<Landmark>> landmarkItemList;
+    public static File photo;
+
+    public static File getPhoto() {
+        return photo;
+    }
+
+    public static void setPhoto(File photo) {
+        LoginActivity.photo = photo;
+    }
 
     public static void setLoggedInUser(LoggedInUser user){ loggedInUser = user;}
     public static LoggedInUser getLoggedInUser() { return loggedInUser;}
@@ -51,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        setPhoto(getPhotoFile("landmark"));
 
 //        FloatingActionButton fab = findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -121,5 +137,15 @@ public class LoginActivity extends AppCompatActivity {
         landmarkList.put("Not Found", notFound);
         landmarkList.put("Found", found);
         setLandmarkItemList(landmarkList);
+    }
+
+
+    private String getPhotoFilename(String username){
+        return "IMG_" + username + ".jpg";
+    }
+    private File getPhotoFile(String username){
+        File filesDir = getFilesDir();
+        File file = new File(filesDir, getPhotoFilename(username));
+        return file;
     }
 }

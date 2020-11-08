@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -23,6 +27,8 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,8 +116,10 @@ public class LandmarksListFragment extends Fragment {
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent cInt = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(cInt,Image_Capture_Code);
+                Uri uri = FileProvider.getUriForFile(getActivity(), "com.example.a5236.fileprovider", LoginActivity.getPhoto());
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                startActivityForResult(intent,Image_Capture_Code);
             }
         });
     }
@@ -120,9 +128,8 @@ public class LandmarksListFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Image_Capture_Code) {
             if (resultCode == Activity.RESULT_OK) {
-                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                LoginActivity.setCurrentBitmap(bitmap);
-                NavHostFragment.findNavController(LandmarksListFragment.this)
+               Uri uri = FileProvider.getUriForFile(getActivity(), "com.example.a5236.fileprovider", LoginActivity.getPhoto());
+               NavHostFragment.findNavController(LandmarksListFragment.this)
                         .navigate(R.id.action_landmarksListFragment_to_addLandmarkFragment);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_SHORT).show();
