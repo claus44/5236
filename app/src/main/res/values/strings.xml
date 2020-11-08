@@ -38,8 +38,10 @@
     <string name="prompt_title">Add a title</string>
     <string name="prompt_description">Add a description</string>
     <string name="prompt_hint">Add a hint</string>
-    <string name="prompt_difficulty">1-easy 5-hard</string>
+    <string name="prompt_difficulty">1-easy 10-hard</string>
+    <string name="hint_difficulty">1</string>
     <string name="action_create_landmark">Create Landmark</string>
+    <string name="action_rotate_image">Rotate</string>
     <string name="divider_text">------------OR------------</string>
     <string name="action_retry">Retry</string>
     <string name="title_error">Title required</string>

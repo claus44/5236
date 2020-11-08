@@ -64,7 +64,7 @@ public class AddLandmarkFragment extends Fragment {
     private DatabaseReference mDatabase;
     ImageView mImageView;
     EditText titleEditText,descriptionEditText, hintEditText, difficultyEditText;
-    Button createLandmarkBtn, retryBtn, backBtn;
+    Button createLandmarkBtn, retryBtn, backBtn, rotateBtn;
     ProgressBar loadingProgressBar;
     LoginActivity mContext;
 
@@ -98,6 +98,7 @@ public class AddLandmarkFragment extends Fragment {
         createLandmarkBtn = view.findViewById(R.id.createLandmark);
         retryBtn = view.findViewById(R.id.retry);
         backBtn = view.findViewById(R.id.backButton);
+        rotateBtn = view.findViewById(R.id.rotatePicture);
         loadingProgressBar = view.findViewById(R.id.loading);
 
         mContext = (LoginActivity) getActivity();
@@ -122,6 +123,16 @@ public class AddLandmarkFragment extends Fragment {
             public void onClick(View v) {
                 NavHostFragment.findNavController(AddLandmarkFragment.this)
                         .navigate(R.id.action_addLandmarkFragment_to_landmarksListFragment);
+
+            }
+        });
+
+        rotateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap bitmap = rotateImage(LoginActivity.getCurrentBitmap(), 90 );
+                mImageView.setImageBitmap(bitmap);
+                LoginActivity.setCurrentBitmap(bitmap);
 
             }
         });
