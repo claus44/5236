@@ -2,6 +2,8 @@ package com.example.a5236;
 
 import android.net.Uri;
 
+import com.example.a5236.data.model.LoggedInUser;
+
 import java.util.List;
 
 public class Landmark {
@@ -11,17 +13,19 @@ public class Landmark {
     private String coordinates;
     private String image;
     private String description;
-    private List<String> hints;
-    private Account createdBy;
+    private String hint;
+    private String createdBy;
+    private List<String> foundByUsers;
 
-    public Landmark(String title, int difficulty, String coordinates, String image, String description, List<String> hints, Account createdBy) {
+    public Landmark(String title, int difficulty, String coordinates, String image, String description, String hint, String createdBy, List<String> foundByUsers) {
         this.title = title;
         this.difficulty = difficulty;
         this.coordinates = coordinates;
         this.image = image;
         this.description = description;
-        this.hints = hints;
+        this.hint = hint;
         this.createdBy = createdBy;
+        this.foundByUsers = foundByUsers;
     }
 
     public String getTitle() {
@@ -64,19 +68,19 @@ public class Landmark {
         this.description = description;
     }
 
-    public List<String> getHints() {
-        return hints;
-    }
+    public String getHint() { return hint; }
 
-    public void setHints(List<String> hints) {
-        this.hints = hints;
-    }
+    public void setHint(String hint) { this.hint = hint; }
 
-    public Account getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(Account createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
+
+    public List<String> getFoundByUsers() { return foundByUsers; }
+
+    public void setFoundByUsers(List<String> foundByUsers) { this.foundByUsers = foundByUsers; }
 }

@@ -39,11 +39,24 @@
         <action
             android:id="@+id/action_landmarksListFragment_to_landmarkFragment"
             app:destination="@id/landmarkFragment" />
+        <action
+            android:id="@+id/action_landmarksListFragment_to_addLandmarkFragment"
+            app:destination="@id/addLandmarkFragment" />
     </fragment>
     <fragment
         android:id="@+id/landmarkFragment"
         android:name="com.example.a5236.LandmarkFragment"
         android:label="fragment_landmark"
         tools:layout="@layout/fragment_landmark" />
+
+    <fragment
+        android:id="@+id/addLandmarkFragment"
+        android:name="com.example.a5236.AddLandmarkFragment"
+        android:label="fragment_add_landmark"
+        tools:layout="@layout/fragment_add_landmark" >
+        <action
+            android:id="@+id/action_addLandmarkFragment_to_landmarksListFragment"
+            app:destination="@id/landmarksListFragment" />
+    </fragment>
 
 </navigation>
