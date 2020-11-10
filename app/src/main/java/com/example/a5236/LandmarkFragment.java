@@ -1,6 +1,7 @@
 package com.example.a5236;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+import com.example.a5236.data.model.LoggedInUser;
 import com.example.a5236.ui.login.LoginFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -38,6 +40,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static androidx.core.content.ContextCompat.getSystemService;
@@ -54,6 +58,7 @@ public class LandmarkFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private final int PERMISSION_REQUEST_CODE_LOCATION = 3;
     private static Landmark landmark;
     private StorageReference mStorageRef;
     private Context mContext;
@@ -130,6 +135,9 @@ public class LandmarkFragment extends Fragment {
         final ImageView landmarkImg = getView().findViewById(R.id.landmark_img);
         final TextView landmarkTitle = getView().findViewById(R.id.landmark_title);
         final TextView landmarkDescription = getView().findViewById(R.id.landmark_description);
+        //disable found and hint button if user already found landmark
+        foundButton.setEnabled(!landmark.getFoundByUsers().contains(LoggedInUser.getUserId()));
+        hintButton.setEnabled(!landmark.getFoundByUsers().contains(LoggedInUser.getUserId()));
 
         //landmarkImg.setImageBitmap((Uri) LandmarkActivity.currentLandmark.getImage());
         // TODO: figure out how to handle images
@@ -141,49 +149,31 @@ public class LandmarkFragment extends Fragment {
         foundButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int permission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
-                if (permission != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
 
-                    // permission denied
-                    ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION} , 44);
-                    permission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
-                }
-                if (permission == PackageManager.PERMISSION_GRANTED) {
-                    fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Location> task) {
-                            Location location = task.getResult();
-                            if (location != null) {
-                                Double latitude = location.getLatitude();
-                                Double longtitude = location.getLongitude();
-                                coordinates = longtitude + "," + latitude;
-                                mDatabase = FirebaseDatabase.getInstance().getReference();
-                                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        //TODO
-                                    }
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION} , PERMISSION_REQUEST_CODE_LOCATION );
+//                int permission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
+//                if (permission != PackageManager.PERMISSION_GRANTED) {
+//                    // TODO: Consider calling
+//                    //    ActivityCompat#requestPermissions
+//                    // here to request the missing permissions, and then overriding
+//                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                    //                                          int[] grantResults)
+//                    // to handle the case where the user grants the permission. See the documentation
+//                    // for ActivityCompat#requestPermissions for more details.
+//
+//                    // permission denied
+//                    ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION} , 44);
+//                    permission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
+//                }
+//                if (permission == PackageManager.PERMISSION_GRANTED) {
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                    }
-                                });
-                            }
-                        }
-                    });
-                } else { //location permission denied. Shows toast to user
-                    String denied = "Location" + getString(R.string.permission_denied);
-                    if (getContext() != null && getContext().getApplicationContext() != null) {
-                        Toast.makeText(getContext().getApplicationContext(), denied, Toast.LENGTH_LONG).show();
-                    }
-                }
+
+//                } else { //location permission denied. Shows toast to user
+//                    String denied = "Location" + getString(R.string.permission_denied);
+//                    if (getContext() != null && getContext().getApplicationContext() != null) {
+//                        Toast.makeText(getContext().getApplicationContext(), denied, Toast.LENGTH_LONG).show();
+//                    }
+//                }
             }
         });
 
@@ -193,6 +183,79 @@ public class LandmarkFragment extends Fragment {
 
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE_LOCATION:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkFoundLandmark();
+                }else {
+                    Toast.makeText(getActivity(), "Need Location Access", Toast.LENGTH_SHORT).show();
+                    // Explain to the user that the feature is unavailable because
+                    // the features requires a permission that the user has denied.
+                    // At the same time, respect the user's decision. Don't link to
+                    // system settings in an effort to convince the user to change
+                    // their decision.
+                }
+                return;
+        }
+        // Other 'case' lines to check for other
+        // permissions this app might request.
+    }
+
+    @SuppressLint("MissingPermission")
+    // only called if permission is granted
+    private void checkFoundLandmark() {
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = task.getResult();
+                if (location != null) {
+                    Double latitude = location.getLatitude();
+                    Double longitude = location.getLongitude();
+                    coordinates = longitude + "," + latitude;
+                    if(distance(landmark.getCoordinates(), latitude, longitude) <= 100) {
+
+                        mDatabase = FirebaseDatabase.getInstance().getReference();
+                        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                int score = Integer.parseInt(snapshot.child("Accounts")
+                                        .child(LoggedInUser.getUserId()).child("score").getValue().toString());
+
+                                mDatabase.child("Accounts").child(LoggedInUser.getUserId())
+                                        .child("score").setValue(1 + score);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    //gets distance between guess and actual location of landmark
+    public static double distance(String landmarkCoordinates, double latGuess, double lonGuess) {
+
+        final int R = 6371; // Radius of the earth
+
+        double lonLandmark = Double.parseDouble(landmarkCoordinates.substring(0,landmarkCoordinates.indexOf(',')));
+        double latLandmark = Double.parseDouble(landmarkCoordinates.substring(landmarkCoordinates.indexOf(',') + 1));
+
+        double latDistance = Math.toRadians(latGuess - latLandmark);
+        double lonDistance = Math.toRadians(lonGuess - lonLandmark);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(latLandmark)) * Math.cos(Math.toRadians(latGuess))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c * 1000 * 3.281; // convert to meters and then feet
+
     }
 
 
