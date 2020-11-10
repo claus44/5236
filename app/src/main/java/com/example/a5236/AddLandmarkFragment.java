@@ -1,6 +1,7 @@
 package com.example.a5236;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -67,6 +68,9 @@ public class AddLandmarkFragment extends Fragment {
     Button createLandmarkBtn, retryBtn, backBtn, rotateBtn;
     ProgressBar loadingProgressBar;
     LoginActivity mContext;
+    private final int PERMISSION_REQUEST_CODE_LOCATION = 3;
+    private String title, desc, hint;
+    private int difficulty;
 
     FusedLocationProviderClient fusedLocationProviderClient;
     private String coordinates;
@@ -150,40 +154,60 @@ public class AddLandmarkFragment extends Fragment {
         createLandmarkBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                loadingProgressBar.setVisibility(View.VISIBLE);
-            final String title = titleEditText.getText().toString();
-            final String desc = descriptionEditText.getText().toString();
-            final String hint = hintEditText.getText().toString();
-            final int difficulty = Integer.parseInt(difficultyEditText.getText().toString());
-            if(ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED){
-                fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        Location location = task.getResult();
-                        if(location != null){
-                            Double latitude = location.getLatitude();
-                            Double longtitude = location.getLongitude();
-                            coordinates = longtitude + "," + latitude;
-                            mDatabase = FirebaseDatabase.getInstance().getReference();
-                            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    tryCreateLandmark(snapshot, title, difficulty, desc, hint);
-                                }
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) { }
-                            });
-                        }
-                    }
-                });
-            }else{
-                // permission denied
-                ActivityCompat.requestPermissions(mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION} , 44);
-            }
+            title = titleEditText.getText().toString();
+            desc = descriptionEditText.getText().toString();
+            hint = hintEditText.getText().toString();
+            difficulty = Integer.parseInt(difficultyEditText.getText().toString());
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION} , PERMISSION_REQUEST_CODE_LOCATION );
             }
         });
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE_LOCATION:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    loadingProgressBar.setVisibility(View.VISIBLE);
+                    createLandmarkWithLocation();
+                }else {
+                    loadingProgressBar.setVisibility(View.GONE);
+                    Toast.makeText(getActivity(), "Need Location Access", Toast.LENGTH_SHORT).show();
+                    // Explain to the user that the feature is unavailable because
+                    // the features requires a permission that the user has denied.
+                    // At the same time, respect the user's decision. Don't link to
+                    // system settings in an effort to convince the user to change
+                    // their decision.
+                }
+                return;
+        }
+        // Other 'case' lines to check for other
+        // permissions this app might request.
+    }
 
-
+    @SuppressLint("MissingPermission")
+    // only called if permission is granted
+    private void createLandmarkWithLocation(){
+        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = task.getResult();
+                if(location != null){
+                    Double latitude = location.getLatitude();
+                    Double longtitude = location.getLongitude();
+                    coordinates = longtitude + "," + latitude;
+                    mDatabase = FirebaseDatabase.getInstance().getReference();
+                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            tryCreateLandmark(snapshot, title, difficulty, desc, hint);
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) { }
+                    });
+                }
+            }
+        });
     }
 
     private final TextWatcher txtWatcher = new TextWatcher() {
@@ -196,8 +220,13 @@ public class AddLandmarkFragment extends Fragment {
         @Override
         public void afterTextChanged(Editable s) {
             int checksPassed = 0;
-            if(titleEditText.getText().toString().length()!=0){
-                checksPassed++;
+            if(titleEditText.getText().toString().length()!=0 ){
+                if(!titleEditText.getText().toString().matches("[\\dA-Za-z]+")){
+                    Toast.makeText(getContext().getApplicationContext(), "Title can only contain letters and digits", Toast.LENGTH_SHORT).show();
+                    titleEditText.setError(mContext.getResources().getString(R.string.title_error));
+                }else {
+                    checksPassed++;
+                }
             }else{
                 titleEditText.setError(mContext.getResources().getString(R.string.title_error));
             }
@@ -256,7 +285,6 @@ public class AddLandmarkFragment extends Fragment {
 
                 @Override
                 public void onFailure(@NonNull Exception exception) {
-                    loadingProgressBar.setVisibility(View.GONE);
                     Toast.makeText(getContext().getApplicationContext(), "Failed to create landmark", Toast.LENGTH_LONG).show();
 
                 }
@@ -279,6 +307,7 @@ public class AddLandmarkFragment extends Fragment {
             loadingProgressBar.setVisibility(View.GONE);
             Toast.makeText(getContext().getApplicationContext(), "Landmark Title Already Exists", Toast.LENGTH_LONG).show();
         }
+
     }
     private boolean checkTitleExists(DataSnapshot dataSnapshot, final String title){
         boolean landmarkExists = false;
