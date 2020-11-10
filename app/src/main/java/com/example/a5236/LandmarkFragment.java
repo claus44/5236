@@ -1,11 +1,16 @@
 package com.example.a5236;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -16,13 +21,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import com.example.a5236.ui.login.LoginFragment;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 
@@ -40,14 +54,19 @@ public class LandmarkFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private static Landmark landmark = LoginActivity.getCurrentLandmark();
+    private static Landmark landmark;
+    private StorageReference mStorageRef;
+    private Context mContext;
+    private String coordinates;
+    FusedLocationProviderClient fusedLocationProviderClient;
+    private DatabaseReference mDatabase;
+
     //final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
     public LandmarkFragment() {
         // Required empty public constructor
     }
-
 
 
     /**
@@ -93,19 +112,6 @@ public class LandmarkFragment extends Fragment {
 //        landmarkTitle.setText(landmark.getTitle());
 //        landmarkDescription.setText(landmark.getDescription());
 
-//        foundButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-//
-//        hintButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
 
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_landmark, container, false);
@@ -113,6 +119,11 @@ public class LandmarkFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+
+        landmark = LoginActivity.getCurrentLandmark();
+        mContext = (LoginActivity) getActivity();
+        //Initialize fusedLocationProviderClient
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mContext);
 
         final Button foundButton = getView().findViewById(R.id.landmark_found);
         final Button hintButton = getView().findViewById(R.id.landmark_hint);
@@ -124,7 +135,64 @@ public class LandmarkFragment extends Fragment {
         // TODO: figure out how to handle images
         landmarkTitle.setText(landmark.getTitle());
         landmarkDescription.setText(landmark.getDescription());
+        mStorageRef = FirebaseStorage.getInstance().getReference().child(landmark.getImage());
+        GlideApp.with(mContext).load(mStorageRef).into(landmarkImg);
 
+        foundButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int permission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
+                if (permission != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+
+                    // permission denied
+                    ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION} , 44);
+                    permission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
+                }
+                if (permission == PackageManager.PERMISSION_GRANTED) {
+                    fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            Location location = task.getResult();
+                            if (location != null) {
+                                Double latitude = location.getLatitude();
+                                Double longtitude = location.getLongitude();
+                                coordinates = longtitude + "," + latitude;
+                                mDatabase = FirebaseDatabase.getInstance().getReference();
+                                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        //TODO
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                    }
+                                });
+                            }
+                        }
+                    });
+                } else { //location permission denied. Shows toast to user
+                    String denied = "Location" + getString(R.string.permission_denied);
+                    if (getContext() != null && getContext().getApplicationContext() != null) {
+                        Toast.makeText(getContext().getApplicationContext(), denied, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+
+        hintButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
 
