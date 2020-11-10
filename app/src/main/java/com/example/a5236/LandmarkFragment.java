@@ -223,11 +223,22 @@ public class LandmarkFragment extends Fragment {
                         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                                 int score = Integer.parseInt(snapshot.child("Accounts")
                                         .child(LoggedInUser.getUserId()).child("score").getValue().toString());
-
                                 mDatabase.child("Accounts").child(LoggedInUser.getUserId())
                                         .child("score").setValue(1 + score);
+
+                                ArrayList<String> foundByUsersAL = (ArrayList<String>)
+                                        snapshot.child("Landmarks").child(landmark.getTitle())
+                                                .child("foundByUsers").getValue();
+
+                                foundByUsersAL.add(LoggedInUser.getUserId());
+                                mDatabase.child("Landmarks").child(landmark.getTitle())
+                                        .child("foundByUsers").setValue(foundByUsersAL);
+
+
+
                             }
 
                             @Override
