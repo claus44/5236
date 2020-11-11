@@ -105,6 +105,12 @@ public class LandmarkFragment extends Fragment {
 //    }
 
     @Override
+    public void onStart() {
+
+        super.onStart();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -126,8 +132,12 @@ public class LandmarkFragment extends Fragment {
         final TextView landmarkDescription = getView().findViewById(R.id.landmark_description);
         final TextView landmarkHint = getView().findViewById(R.id.landmark_hint_text);
         //disable found and hint button if user already found landmark
-        foundButton.setEnabled(!landmark.getFoundByUsers().contains(LoggedInUser.getUserId()));
-        hintButton.setEnabled(!landmark.getFoundByUsers().contains(LoggedInUser.getUserId()));
+        if (landmark.getFoundByUsers().contains(LoggedInUser.getUserId())) {
+            foundButton.setEnabled(false);
+            hintButton.setEnabled(false);
+            landmarkHint.setText(landmark.getHint());
+        }
+
 
         //landmarkImg.setImageBitmap((Uri) LandmarkActivity.currentLandmark.getImage());
         // TODO: figure out how to handle images
@@ -204,8 +214,11 @@ public class LandmarkFragment extends Fragment {
                     Double longitude = location.getLongitude();
                     coordinates = longitude + "," + latitude;
                     if(distance(landmark.getCoordinates(), latitude, longitude) <= 100) {
+                        //update buttons and foundByUsers locally
                         LandmarkFragment.foundButton.setEnabled(false);
                         LandmarkFragment.hintButton.setEnabled(false);
+                        landmark.getFoundByUsers().add(LoggedInUser.getUserId());
+
                         mDatabase = FirebaseDatabase.getInstance().getReference();
                         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
