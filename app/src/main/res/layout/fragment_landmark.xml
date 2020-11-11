@@ -28,17 +28,22 @@
         android:text="TextView"
         tools:text="@string/landmark_description" />
 
+    <TextView
+        android:id="@+id/landmark_hint_text"
+        android:layout_width="match_parent"
+        android:layout_height="130dp" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="195dp">
+        android:layout_height="60dp">
 
         <Button
             android:id="@+id/landmark_found"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
             android:text="@string/landmark_found_btn"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/landmark_hint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -46,14 +51,12 @@
             android:id="@+id/landmark_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="24dp"
             android:text="@string/landmark_hint_btn"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/landmark_found" />
+            app:layout_constraintStart_toEndOf="@+id/landmark_found"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.503" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

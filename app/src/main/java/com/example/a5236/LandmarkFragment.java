@@ -66,6 +66,9 @@ public class LandmarkFragment extends Fragment {
     FusedLocationProviderClient fusedLocationProviderClient;
     private DatabaseReference mDatabase;
 
+    static Button foundButton;
+    static Button hintButton;
+
     //final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 
@@ -104,20 +107,6 @@ public class LandmarkFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
-//        final Button foundButton = getView().findViewById(R.id.landmark_found);
-//        final Button hintButton = getView().findViewById(R.id.landmark_hint);
-//        final ImageView landmarkImg = getView().findViewById(R.id.landmark_img);
-//        final TextView landmarkTitle = getView().findViewById(R.id.landmark_title);
-//        final TextView landmarkDescription = getView().findViewById(R.id.landmark_description);
-//
-//        //landmarkImg.setImageBitmap((Uri) LandmarkActivity.currentLandmark.getImage());
-//        // TODO: figure out how to handle images
-//        landmarkTitle.setText(landmark.getTitle());
-//        landmarkDescription.setText(landmark.getDescription());
-
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_landmark, container, false);
     }
@@ -130,11 +119,12 @@ public class LandmarkFragment extends Fragment {
         //Initialize fusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(mContext);
 
-        final Button foundButton = getView().findViewById(R.id.landmark_found);
-        final Button hintButton = getView().findViewById(R.id.landmark_hint);
+        foundButton = getView().findViewById(R.id.landmark_found);
+        hintButton = getView().findViewById(R.id.landmark_hint);
         final ImageView landmarkImg = getView().findViewById(R.id.landmark_img);
         final TextView landmarkTitle = getView().findViewById(R.id.landmark_title);
         final TextView landmarkDescription = getView().findViewById(R.id.landmark_description);
+        final TextView landmarkHint = getView().findViewById(R.id.landmark_hint_text);
         //disable found and hint button if user already found landmark
         foundButton.setEnabled(!landmark.getFoundByUsers().contains(LoggedInUser.getUserId()));
         hintButton.setEnabled(!landmark.getFoundByUsers().contains(LoggedInUser.getUserId()));
@@ -149,37 +139,33 @@ public class LandmarkFragment extends Fragment {
         foundButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION} , PERMISSION_REQUEST_CODE_LOCATION );
-//                int permission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
-//                if (permission != PackageManager.PERMISSION_GRANTED) {
-//                    // TODO: Consider calling
-//                    //    ActivityCompat#requestPermissions
-//                    // here to request the missing permissions, and then overriding
-//                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//                    //                                          int[] grantResults)
-//                    // to handle the case where the user grants the permission. See the documentation
-//                    // for ActivityCompat#requestPermissions for more details.
-//
-//                    // permission denied
-//                    ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION} , 44);
-//                    permission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
-//                }
-//                if (permission == PackageManager.PERMISSION_GRANTED) {
-
-
-//                } else { //location permission denied. Shows toast to user
-//                    String denied = "Location" + getString(R.string.permission_denied);
-//                    if (getContext() != null && getContext().getApplicationContext() != null) {
-//                        Toast.makeText(getContext().getApplicationContext(), denied, Toast.LENGTH_LONG).show();
-//                    }
-//                }
             }
         });
 
         hintButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                mDatabase = FirebaseDatabase.getInstance().getReference();
+                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                        int score = Integer.parseInt(snapshot.child("Accounts")
+                                .child(LoggedInUser.getUserId()).child("score").getValue().toString());
+                        mDatabase.child("Accounts").child(LoggedInUser.getUserId())
+                                .child("score").setValue(score - 1);
+
+                        landmarkHint.setText(landmark.getHint());
+                        hintButton.setEnabled(false);
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
 
             }
         });
@@ -218,7 +204,8 @@ public class LandmarkFragment extends Fragment {
                     Double longitude = location.getLongitude();
                     coordinates = longitude + "," + latitude;
                     if(distance(landmark.getCoordinates(), latitude, longitude) <= 100) {
-
+                        LandmarkFragment.foundButton.setEnabled(false);
+                        LandmarkFragment.hintButton.setEnabled(false);
                         mDatabase = FirebaseDatabase.getInstance().getReference();
                         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -227,7 +214,7 @@ public class LandmarkFragment extends Fragment {
                                 int score = Integer.parseInt(snapshot.child("Accounts")
                                         .child(LoggedInUser.getUserId()).child("score").getValue().toString());
                                 mDatabase.child("Accounts").child(LoggedInUser.getUserId())
-                                        .child("score").setValue(1 + score);
+                                        .child("score").setValue(landmark.getDifficulty() + score);
 
                                 ArrayList<String> foundByUsersAL = (ArrayList<String>)
                                         snapshot.child("Landmarks").child(landmark.getTitle())
