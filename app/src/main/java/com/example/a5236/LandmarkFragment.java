@@ -56,8 +56,8 @@ public class LandmarkFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
 
     private final int PERMISSION_REQUEST_CODE_LOCATION = 3;
     private static Landmark landmark;
@@ -87,14 +87,14 @@ public class LandmarkFragment extends Fragment {
 //     * @return A new instance of fragment LandmarkFragment.
 //     */
 //    // TODO: Rename and change types and number of parameters
-//    public static LandmarkFragment newInstance(String param1, String param2) {
-//        LandmarkFragment fragment = new LandmarkFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
+    public static LandmarkFragment newInstance(String param1, String param2) {
+        LandmarkFragment fragment = new LandmarkFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
 
 
@@ -223,6 +223,9 @@ public class LandmarkFragment extends Fragment {
                                 mDatabase.child("Landmarks").child(landmark.getTitle())
                                         .child("foundByUsers").setValue(foundByUsersAL);
 
+                                Toast.makeText(getActivity(), "Location Found! Score: " +
+                                        (score + landmark.getDifficulty()), Toast.LENGTH_SHORT).show();
+
                                 updateLandmarkList(landmark);
 
                             }
@@ -231,6 +234,9 @@ public class LandmarkFragment extends Fragment {
                             public void onCancelled(@NonNull DatabaseError error) {
                             }
                         });
+
+                        NavHostFragment.findNavController(LandmarkFragment.this)
+                                .navigate(R.id.action_landmarkFragment_to_landmarksListFragment);
                     } else {
                         Toast.makeText(getActivity(), "Wrong Location!", Toast.LENGTH_SHORT).show();
                     }
