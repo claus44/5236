@@ -41,10 +41,18 @@ public class LoginActivity extends AppCompatActivity {
     public static LoggedInUser loggedInUser;
     public static HashMap<String, List<Landmark>> landmarkItemList;
     public static File photo;
+    public static HashMap<String, String> leaderboard;
     private String response;
     public static Menu myMenu;
     private DatabaseReference mDatabase;
 
+    public static HashMap<String, String> getLeaderboard() {
+        return leaderboard;
+    }
+
+    public static void setLeaderboard(HashMap<String, String> leaderboard) {
+        LoginActivity.leaderboard = leaderboard;
+    }
 
     public static File getPhoto() {
         return photo;
