@@ -50,4 +50,9 @@
     <string name="desc_error">Description required</string>
     <string name="hint_error">Hint required</string>
     <string name="diff_error">Difficulty between 1 and 10 required</string>
+
+    <string name="leaderboard">Leaderboard</string>
+    <string name="friend_switch">Friends Only</string>
+    <color name="gray">#d4d0cf</color>
+    <color name="white">#FFFFFF</color>
 </resources>

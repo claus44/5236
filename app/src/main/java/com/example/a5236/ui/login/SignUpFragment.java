@@ -43,7 +43,9 @@ public class SignUpFragment extends Fragment {
     private DatabaseReference mDatabase;
     private LoggedInUser user;
     private static final String TAG = "SignUpFragment";
-
+    private ProgressBar loadingProgressBar;
+    private EditText usernameEditText, passwordEditText,passwordConfirmationEditText;
+    private Button signUpButton,loginButton,updatePassword,deleteUser;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -58,14 +60,14 @@ public class SignUpFragment extends Fragment {
         signUpViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = view.findViewById(R.id.username);
-        final EditText passwordEditText = view.findViewById(R.id.password);
-        final EditText passwordConfirmationEditText = view.findViewById(R.id.passwordConfirmation);
-        final Button signUpButton = view.findViewById(R.id.signup);
-        final Button loginButton = view.findViewById(R.id.login);
-        final Button updatePassword = view.findViewById(R.id.update_password);
-        final Button deleteUser = view.findViewById(R.id.deleteUser);
-        final ProgressBar loadingProgressBar = view.findViewById(R.id.loading);
+        usernameEditText = view.findViewById(R.id.username);
+        passwordEditText = view.findViewById(R.id.password);
+        passwordConfirmationEditText = view.findViewById(R.id.passwordConfirmation);
+        signUpButton = view.findViewById(R.id.signup);
+        loginButton = view.findViewById(R.id.login);
+        updatePassword = view.findViewById(R.id.update_password);
+        deleteUser = view.findViewById(R.id.deleteUser);
+        loadingProgressBar = view.findViewById(R.id.loading);
 
         signUpViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
             @Override
@@ -127,9 +129,7 @@ public class SignUpFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                    signUpViewModel.register(usernameEditText.getText().toString(),
-//                            passwordEditText.getText().toString(),
-//                            passwordConfirmationEditText.getText().toString());
+                    signUp();
                 }
                 return false;
             }
@@ -138,34 +138,7 @@ public class SignUpFragment extends Fragment {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                final String username = usernameEditText.getText().toString();
-                final String password = passwordEditText.getText().toString();
-                String passwordConfirm = passwordConfirmationEditText.getText().toString();
-                if(password.equals(passwordConfirm)){
-                    mDatabase = FirebaseDatabase.getInstance().getReference();
-                    user = new LoggedInUser(username);
-                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            boolean userExists = checkUsernameExists(snapshot, username, password);
-                            if(!userExists){
-                                signUpViewModel.register(true, user, true);
-                                LoginActivity.setLoggedInUser(user);
-                                LoginActivity.retrieveLandmarkData(snapshot);
-                                NavHostFragment.findNavController(SignUpFragment.this)
-                                    .navigate(R.id.action_signUpFragment_to_landmarkActivity);
-                            }else{
-                                signUpViewModel.register(true, user, false);
-                                loadingProgressBar.setVisibility(View.GONE);
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) { }
-                    });
-                }else{
-                    signUpViewModel.register(false, user, false);
-                }
+                signUp();
             }
         });
 
@@ -246,7 +219,6 @@ public class SignUpFragment extends Fragment {
 
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + " "+ model.getDisplayName();
-        // TODO : initiate successful sign up in experience
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(getContext().getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         }
@@ -302,5 +274,36 @@ public class SignUpFragment extends Fragment {
             }
         }
         return userDeleted;
+    }
+    private void signUp(){
+        loadingProgressBar.setVisibility(View.VISIBLE);
+        final String username = usernameEditText.getText().toString();
+        final String password = passwordEditText.getText().toString();
+        String passwordConfirm = passwordConfirmationEditText.getText().toString();
+        if(password.equals(passwordConfirm)){
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            user = new LoggedInUser(username);
+            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    boolean userExists = checkUsernameExists(snapshot, username, password);
+                    if(!userExists){
+                        signUpViewModel.register(true, user, true);
+                        LoginActivity.setLoggedInUser(user);
+                        LoginActivity.retrieveLandmarkData(snapshot);
+                        LoginActivity.retrieveLeaderboardData(snapshot);
+                        NavHostFragment.findNavController(SignUpFragment.this)
+                                .navigate(R.id.action_signUpFragment_to_landmarkActivity);
+                    }else{
+                        signUpViewModel.register(true, user, false);
+                        loadingProgressBar.setVisibility(View.GONE);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) { }
+            });
+        }else{
+            signUpViewModel.register(false, user, false);
+        }
     }
 }

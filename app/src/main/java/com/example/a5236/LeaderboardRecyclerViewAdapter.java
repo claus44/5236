@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -17,13 +18,15 @@ import java.util.HashMap;
 public class LeaderboardRecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     private static final String TAG = "LeaderboardRecyclerView";
-
-    private ArrayList<String> mUsernameAndScore = new ArrayList<>();
+    private ArrayList<String> mUsernames;
+    private ArrayList<Integer> mScores;
     private Context mContext;
 
-    public LeaderboardRecyclerViewAdapter(ArrayList<String> usernameAndScore, Context context) {
-        mUsernameAndScore = usernameAndScore;
-        mContext = context;
+
+    public LeaderboardRecyclerViewAdapter(Context mContext, ArrayList<String> mUsernames, ArrayList<Integer> mScores ) {
+        this.mUsernames = mUsernames;
+        this.mScores = mScores;
+        this.mContext = mContext;
     }
 
     @NonNull
@@ -36,29 +39,23 @@ public class LeaderboardRecyclerViewAdapter extends RecyclerView.Adapter<ViewHol
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: called.");
-
-        //TODO set the text to the appropriate username and score
-        //holder.usernameAndScore.setText();
-
-        HashMap<String, String> list = LoginActivity.getLeaderboard();
-
+        holder.usernameandscore.setText(mUsernames.get(position) + ":" + mScores.get(position).toString());
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mUsernames.size();
     }
 }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder{
 
-        TextView usernameAndScore;
-        RelativeLayout parentLayout;
+        TextView usernameandscore;
+        LinearLayout parentLayout;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            usernameAndScore = itemView.findViewById(R.id.username_and_score);
+            usernameandscore = itemView.findViewById(R.id.username_and_score);
             parentLayout = itemView.findViewById(R.id.parent_layout);
     }
 }
