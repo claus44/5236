@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SignUpFragment extends Fragment {
@@ -271,6 +272,8 @@ public class SignUpFragment extends Fragment {
         if (!userExists) {
             Account account = new Account(username, password, 0);
             mDatabase.child("Accounts").child(account.getUsername()).setValue(account);
+            mDatabase.child("Friends").child(account.getUsername()).setValue(username);
+            mDatabase.child("Friends").child(account.getUsername()).setValue(new ArrayList<String>());
         }
         return userExists;
     }

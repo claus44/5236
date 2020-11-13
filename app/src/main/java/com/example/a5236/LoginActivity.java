@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -247,13 +248,26 @@ public class LoginActivity extends AppCompatActivity {
                         response = String.valueOf(taskEditText.getText());
 
                         if (id == R.id.option_add_friend) {
+                            if (!response.equals(LoggedInUser.getUserId())) {
+                                mDatabase = FirebaseDatabase.getInstance().getReference();
+                                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        addFriend(response, snapshot);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                    }
+                                });
+                            }
 
                         } else if (id == R.id.option_remove_friend) {
 
                         } else if (id == R.id.option_update_password) {
 
                         } else if (id == R.id.option_delete_account) {
-
+                            //TODO: Handle user after account deleted
                             if (response.equals(LoggedInUser.getUserId())) {
                                 mDatabase = FirebaseDatabase.getInstance().getReference();
                                 mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -300,5 +314,16 @@ public class LoginActivity extends AppCompatActivity {
         }
         return userDeleted;
     }
+
+    private void addFriend (String friend, DataSnapshot snapshot){
+        if (snapshot.child("Accounts").child("friend").getValue() != null) {
+            ArrayList<String> friendsList = (ArrayList<String>) snapshot.child("Friends")
+                    .child(LoggedInUser.getUserId()).getValue();
+            friendsList.add(friend);
+            mDatabase.child("Friends").child(LoggedInUser.getUserId()).setValue(friendsList);
+        }
+
+    }
+
 
 }
