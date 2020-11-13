@@ -109,8 +109,7 @@ public class LandmarksListFragment extends Fragment {
                 return false;
             }
         });
-
-        //TODO: Update navigate action to profile page.
+        
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
