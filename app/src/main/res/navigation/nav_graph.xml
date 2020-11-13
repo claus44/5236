@@ -42,6 +42,9 @@
         <action
             android:id="@+id/action_landmarksListFragment_to_addLandmarkFragment"
             app:destination="@id/addLandmarkFragment" />
+        <action
+            android:id="@+id/action_landmarksListFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
     </fragment>
     <fragment
         android:id="@+id/landmarkFragment"
@@ -62,5 +65,9 @@
             android:id="@+id/action_addLandmarkFragment_to_landmarksListFragment"
             app:destination="@id/landmarksListFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.a5236.ProfileFragment"
+        android:label="ProfileFragment" />
 
 </navigation>

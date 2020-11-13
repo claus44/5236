@@ -112,7 +112,7 @@ public class LandmarksListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 NavHostFragment.findNavController(LandmarksListFragment.this)
-                        .navigate(R.id.action_landmarksListFragment_to_landmarkFragment);
+                        .navigate(R.id.action_landmarksListFragment_to_profileFragment);
 
             }
         });
