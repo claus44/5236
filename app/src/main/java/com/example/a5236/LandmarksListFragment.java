@@ -66,6 +66,9 @@ public class LandmarksListFragment extends Fragment {
         final Button cameraButton = view.findViewById(R.id.camera);
         super.onViewCreated(view, savedInstanceState);
         expListView = (ExpandableListView) view.findViewById(R.id.landmarksExpList);
+        LoginActivity.myMenu.findItem(R.id.option_add_friend).setVisible(true);
+        LoginActivity.myMenu.findItem(R.id.option_remove_friend).setVisible(true);
+        LoginActivity.myMenu.findItem(R.id.option_delete_account).setVisible(true);
 
         prepareLandmarkInfo();
 

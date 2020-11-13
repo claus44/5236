@@ -1,23 +1,20 @@
 package com.example.a5236;
 
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
-import android.net.Uri;
 import android.os.Bundle;
 
 import com.example.a5236.data.model.LoggedInUser;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.FileProvider;
 
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,6 +30,9 @@ public class LoginActivity extends AppCompatActivity {
     public static LoggedInUser loggedInUser;
     public static HashMap<String, List<Landmark>> landmarkItemList;
     public static File photo;
+    private String response;
+    public static Menu myMenu;
+
 
     public static File getPhoto() {
         return photo;
@@ -147,5 +147,53 @@ public class LoginActivity extends AppCompatActivity {
         File filesDir = getFilesDir();
         File file = new File(filesDir, getPhotoFilename(username));
         return file;
+    }
+
+    // create an action bar button
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // R.menu.mymenu is a reference to an xml file named mymenu.xml which should be inside your res/menu directory.
+        // If you don't have res/menu, just create a directory named "menu" inside res
+        getMenuInflater().inflate(R.menu.mymenu, menu);
+        myMenu = menu;
+        myMenu.findItem(R.id.option_add_friend).setVisible(false);
+        myMenu.findItem(R.id.option_remove_friend).setVisible(false);
+        myMenu.findItem(R.id.option_delete_account).setVisible(false);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    // handle button activities
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+
+        if (id == R.id.option_add_friend) {
+            showAddItemDialog("Add Friend");
+        }
+        else if (id == R.id.option_remove_friend) {
+            showAddItemDialog("Remove Friend");
+        }
+        else if (id == R.id.option_delete_account) {
+            showAddItemDialog("Are You sure? Enter your Username to confirm.");
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showAddItemDialog(String title) {
+        final EditText taskEditText = new EditText(this);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage("Enter desired Username")
+                .setView(taskEditText)
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        response = String.valueOf(taskEditText.getText());
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
     }
 }
