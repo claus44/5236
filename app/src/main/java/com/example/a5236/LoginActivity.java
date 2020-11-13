@@ -170,6 +170,7 @@ public class LoginActivity extends AppCompatActivity {
         myMenu.findItem(R.id.option_add_friend).setVisible(false);
         myMenu.findItem(R.id.option_remove_friend).setVisible(false);
         myMenu.findItem(R.id.option_delete_account).setVisible(false);
+        myMenu.findItem(R.id.option_update_password).setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -222,16 +223,23 @@ public class LoginActivity extends AppCompatActivity {
     private void showAddItemDialog(final int id) {
         final EditText taskEditText = new EditText(this);
         String title = "";
+        String message = "";
         if (id == R.id.option_add_friend) {
             title = "Add Friend";
+            message = "Enter desired Username";
         } else if (id == R.id.option_remove_friend) {
             title = "Remove Friend";
+            message = "Enter desired Username";
         } else if (id == R.id.option_delete_account) {
-            title = "Are you sure? Enter your username to confirm.";
+            title = "Delete Account";
+            message = "Are you sure? Enter your username to confirm";
+        } else if (id == R.id.option_update_password) {
+            title = "Update Password";
+            message = "Enter your new password";
         }
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(title)
-                .setMessage("Enter desired Username")
+                .setMessage(message)
                 .setView(taskEditText)
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
@@ -241,6 +249,8 @@ public class LoginActivity extends AppCompatActivity {
                         if (id == R.id.option_add_friend) {
 
                         } else if (id == R.id.option_remove_friend) {
+
+                        } else if (id == R.id.option_update_password) {
 
                         } else if (id == R.id.option_delete_account) {
 
