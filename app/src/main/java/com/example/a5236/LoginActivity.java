@@ -1,5 +1,6 @@
 package com.example.a5236;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -7,20 +8,29 @@ import android.os.Bundle;
 
 import com.example.a5236.data.model.LoggedInUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -32,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     public static File photo;
     private String response;
     public static Menu myMenu;
+    private DatabaseReference mDatabase;
 
 
     public static File getPhoto() {
@@ -159,6 +170,7 @@ public class LoginActivity extends AppCompatActivity {
         myMenu.findItem(R.id.option_add_friend).setVisible(false);
         myMenu.findItem(R.id.option_remove_friend).setVisible(false);
         myMenu.findItem(R.id.option_delete_account).setVisible(false);
+        myMenu.findItem(R.id.option_update_password).setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -166,34 +178,127 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        System.out.println(id);
+        showAddItemDialog(id);
 
-
-        if (id == R.id.option_add_friend) {
-            showAddItemDialog("Add Friend");
-        }
-        else if (id == R.id.option_remove_friend) {
-            showAddItemDialog("Remove Friend");
-        }
-        else if (id == R.id.option_delete_account) {
-            showAddItemDialog("Are You sure? Enter your Username to confirm.");
-        }
+//        if (id == R.id.option_add_friend) {
+//
+//        }
+//        else if (id == R.id.option_remove_friend) {
+//            showAddItemDialog("Remove Friend", id);
+//
+//            System.out.println(LoggedInUser.getUserId());
+//
+//
+//        }
+//        else if (id == R.id.option_delete_account) {
+//            showAddItemDialog("Are You sure? Enter your Username to confirm.", id);
+//
+//            if (response.equals(LoggedInUser.getUserId())) {
+//                mDatabase = FirebaseDatabase.getInstance().getReference();
+//                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        boolean userDeleted = deleteUser(snapshot, response);
+//                        if (userDeleted) {
+//                            //TODO: restart app
+//                            //Toast.makeText(LoginActivity, "Successfully Deleted " + response, Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            //Can't happen... maybe. If the loggedInUser doesn't exist in the db, this would happen
+//                            //Toast.makeText((LoginActivity) getActivity(), "Delete Failed: User does not exist", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//                    }
+//                });
+//
+//
+//            }
+//        }
         return super.onOptionsItemSelected(item);
     }
 
-    private void showAddItemDialog(String title) {
+    private void showAddItemDialog(final int id) {
         final EditText taskEditText = new EditText(this);
+        String title = "";
+        String message = "";
+        if (id == R.id.option_add_friend) {
+            title = "Add Friend";
+            message = "Enter desired Username";
+        } else if (id == R.id.option_remove_friend) {
+            title = "Remove Friend";
+            message = "Enter desired Username";
+        } else if (id == R.id.option_delete_account) {
+            title = "Delete Account";
+            message = "Are you sure? Enter your username to confirm";
+        } else if (id == R.id.option_update_password) {
+            title = "Update Password";
+            message = "Enter your new password";
+        }
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(title)
-                .setMessage("Enter desired Username")
+                .setMessage(message)
                 .setView(taskEditText)
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         response = String.valueOf(taskEditText.getText());
+
+                        if (id == R.id.option_add_friend) {
+
+                        } else if (id == R.id.option_remove_friend) {
+
+                        } else if (id == R.id.option_update_password) {
+
+                        } else if (id == R.id.option_delete_account) {
+
+                            if (response.equals(LoggedInUser.getUserId())) {
+                                mDatabase = FirebaseDatabase.getInstance().getReference();
+                                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        boolean userDeleted = deleteUser(snapshot, response);
+                                        if (userDeleted) {
+                                            //TODO: restart app
+                                            //Toast.makeText(LoginActivity, "Successfully Deleted " + response, Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            //Can't happen... maybe. If the loggedInUser doesn't exist in the db, this would happen
+                                            //Toast.makeText((LoginActivity) getActivity(), "Delete Failed: User does not exist", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                    }
+                                });
+
+
+                            }
+                        }
+
                     }
                 })
                 .setNegativeButton("Cancel", null)
                 .create();
         dialog.show();
+        System.out.println(response);
+
     }
+
+    private boolean deleteUser(DataSnapshot dataSnapshot, String username){
+        boolean userDeleted = false;
+        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+            if (ds.getKey().equals("Accounts")) {
+                HashMap<String, Object> hm = (HashMap<String, Object>) ds.getValue();
+                if (hm.containsKey(username)) {
+                    mDatabase.child("Accounts").child(username).removeValue();
+                    userDeleted = true;
+                }
+            }
+        }
+        return userDeleted;
+    }
+
 }

@@ -9,6 +9,9 @@
         android:title="Remove Friend"
         android:visible="true" />
     <item
+        android:id="@+id/option_update_password"
+        android:title="@string/update_password" />
+    <item
         android:id="@+id/option_delete_account"
         android:title="Delete Account"
         android:visible="true" />
