@@ -99,8 +99,7 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 userNameTextView.setText(username);
-                String score = snapshot.child("Accounts")
-                        .child(LoggedInUser.getUserId()).child("score").getValue().toString();
+                String score = snapshot.child(LoggedInUser.getUserId()).child("score").getValue().toString();
                 scoreTextView.setText(score);
 //                for (DataSnapshot ds : snapshot.getChildren()) {
 //                    if (ds.child("username").getValue().equals(username)) {
