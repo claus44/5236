@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class LeaderboardRecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
 
@@ -39,6 +40,9 @@ public class LeaderboardRecyclerViewAdapter extends RecyclerView.Adapter<ViewHol
 
         //TODO set the text to the appropriate username and score
         //holder.usernameAndScore.setText();
+
+        HashMap<String, String> list = LoginActivity.getLeaderboard();
+
     }
 
     @Override

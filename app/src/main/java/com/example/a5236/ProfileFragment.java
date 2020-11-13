@@ -19,6 +19,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import android.widget.TextView;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ProfileFragment#newInstance} factory method to
@@ -99,12 +102,31 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                //set the profile page's tectboxes from
+                //set the profile page's textboxes from
                 userNameTextView.setText(username);
                 String score = snapshot.child(LoggedInUser.getUserId()).child("score").getValue().toString();
                 scoreTextView.setText("score: " + score);
 
-                for
+
+                HashMap<String, Object> hm = (HashMap<String, Object>) snapshot.getValue();
+                for (String key: hm.keySet()) {
+                    HashMap<String, Object> value = (HashMap<String, Object>) hm.get(key);
+                    String scoreValue = value.get("score").toString();
+                    HashMap<String, String> x = LoginActivity.getLeaderboard();
+                    x.put(key, scoreValue);
+                    LoginActivity.setLeaderboard(x);
+                }
+
+//                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+//                    if (ds.getKey().equals("Accounts")) {
+//                        HashMap<String, Object> hm = (HashMap<String, Object>) ds.getValue();
+//                        if(hm.containsKey(username)){
+//                            Account updatedAccount = new Account(username, password,  Integer.parseInt(((HashMap<String, Object>) hm.get(username)).get("score").toString()));
+//                            mDatabase.child("Accounts").child(username).setValue(updatedAccount);
+//                            updatedPassword = true;
+//                        }
+//                    }
+//                }
 //                for (DataSnapshot ds : snapshot.getChildren()) {
 //                    if (ds.child("username").getValue().equals(username)) {
 //                        userNameTextView.setText(username);
