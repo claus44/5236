@@ -47,7 +47,11 @@
         android:id="@+id/landmarkFragment"
         android:name="com.example.a5236.LandmarkFragment"
         android:label="fragment_landmark"
-        tools:layout="@layout/fragment_landmark" />
+        tools:layout="@layout/fragment_landmark" >
+        <action
+            android:id="@+id/action_landmarkFragment_to_landmarksListFragment"
+            app:destination="@id/landmarksListFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/addLandmarkFragment"

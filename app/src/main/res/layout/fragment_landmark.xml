@@ -15,45 +15,86 @@
         android:layout_height="269dp"
         android:src="@android:drawable/ic_menu_gallery" />
 
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="#000000" />
+
     <TextView
         android:id="@+id/landmark_title"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:text="@string/landmark_title" />
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/landmark_title"
+        android:textColor="@android:color/black"
+        android:textSize="24sp" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@color/colorAccent" />
 
     <TextView
         android:id="@+id/landmark_description"
         android:layout_width="match_parent"
-        android:layout_height="187dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
         android:text="TextView"
+        android:textColor="#000000"
+        android:textSize="18sp"
         tools:text="@string/landmark_description" />
+
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+    <TextView
+        android:id="@+id/hintHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hint:"
+        android:textColor="#000000"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/landmark_hint_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000" />
+
+    <View
+        android:id="@+id/divider4"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="195dp">
+        android:layout_height="match_parent">
 
         <Button
             android:id="@+id/landmark_found"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
             android:text="@string/landmark_found_btn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/landmark_hint"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/landmark_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:layout_marginBottom="24dp"
             android:text="@string/landmark_hint_btn"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/landmark_found" />
+            app:layout_constraintStart_toEndOf="@+id/landmark_found" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
