@@ -100,7 +100,7 @@ public class ProfileFragment extends Fragment {
 
                 userNameTextView.setText(username);
                 String score = snapshot.child(LoggedInUser.getUserId()).child("score").getValue().toString();
-                scoreTextView.setText(score);
+                scoreTextView.setText("score: " + score);
 //                for (DataSnapshot ds : snapshot.getChildren()) {
 //                    if (ds.child("username").getValue().equals(username)) {
 //                        userNameTextView.setText(username);
