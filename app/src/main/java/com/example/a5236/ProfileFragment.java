@@ -89,6 +89,7 @@ public class ProfileFragment extends Fragment {
 
         scoreTextView = getView().findViewById(R.id.score_textview);
         userNameTextView = getView().findViewById(R.id.username_textview);
+        //leaderboardRecyclerView = getView().findViewById(R.id.leaderboard_recyclerview);
 
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
         DatabaseReference userRef = rootRef.child(USERS);
@@ -98,9 +99,12 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
+                //set the profile page's tectboxes from
                 userNameTextView.setText(username);
                 String score = snapshot.child(LoggedInUser.getUserId()).child("score").getValue().toString();
                 scoreTextView.setText("score: " + score);
+
+                for
 //                for (DataSnapshot ds : snapshot.getChildren()) {
 //                    if (ds.child("username").getValue().equals(username)) {
 //                        userNameTextView.setText(username);
