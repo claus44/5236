@@ -15,7 +15,7 @@
             app:destination="@id/signUpFragment" />
         <action
             android:id="@+id/action_loginFragment_to_landmarkActivity"
-            app:destination="@id/landmarkActivity" />
+            app:destination="@id/landmarksListFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
@@ -27,7 +27,7 @@
             app:destination="@id/loginFragment" />
         <action
             android:id="@+id/action_signUpFragment_to_landmarkActivity"
-            app:destination="@id/landmarkActivity" />
+            app:destination="@id/landmarksListFragment" />
 
     </fragment>
 
@@ -35,11 +35,32 @@
         android:id="@+id/landmarksListFragment"
         android:name="com.example.a5236.LandmarksListFragment"
         android:label="fragment_landmarks_list"
-        tools:layout="@layout/fragment_landmarks_list" />
-    <activity
-        android:id="@+id/landmarkActivity"
-        android:name="com.example.a5236.LandmarkActivity"
-        android:label="activity_landmark"
-        tools:layout="@layout/activity_landmark" />
+        tools:layout="@layout/fragment_landmarks_list" >
+        <action
+            android:id="@+id/action_landmarksListFragment_to_landmarkFragment"
+            app:destination="@id/landmarkFragment" />
+        <action
+            android:id="@+id/action_landmarksListFragment_to_addLandmarkFragment"
+            app:destination="@id/addLandmarkFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/landmarkFragment"
+        android:name="com.example.a5236.LandmarkFragment"
+        android:label="fragment_landmark"
+        tools:layout="@layout/fragment_landmark" >
+        <action
+            android:id="@+id/action_landmarkFragment_to_landmarksListFragment"
+            app:destination="@id/landmarksListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addLandmarkFragment"
+        android:name="com.example.a5236.AddLandmarkFragment"
+        android:label="fragment_add_landmark"
+        tools:layout="@layout/fragment_add_landmark" >
+        <action
+            android:id="@+id/action_addLandmarkFragment_to_landmarksListFragment"
+            app:destination="@id/landmarksListFragment" />
+    </fragment>
 
 </navigation>
