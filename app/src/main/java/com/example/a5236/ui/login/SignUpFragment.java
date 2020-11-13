@@ -11,7 +11,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,8 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a5236.Account;
-import com.example.a5236.Landmark;
-import com.example.a5236.LandmarkActivity;
 import com.example.a5236.LoginActivity;
 import com.example.a5236.R;
 import com.example.a5236.data.model.LoggedInUser;

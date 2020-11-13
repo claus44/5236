@@ -2,15 +2,12 @@ package com.example.a5236;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -91,7 +88,11 @@ public class LandmarkListAdapter extends BaseExpandableListAdapter {
         TextView tvLandmarkItemTitle = (TextView) convertView.findViewById(R.id.landmarkListItemTitle);
         tvLandmarkItemTitle.setText(landmarkItem.getTitle());
         TextView tvLandmarkItemDesc = (TextView) convertView.findViewById(R.id.landmarkListItemDescription);
-        tvLandmarkItemDesc.setText(landmarkItem.getDescription());
+        if(landmarkItem.getDescription().length() > 60){
+            tvLandmarkItemDesc.setText(landmarkItem.getDescription().substring(0,60) + "...");
+        }else{
+            tvLandmarkItemDesc.setText(landmarkItem.getDescription());
+        }
 
         ImageView ivLandmarkItemImage = (ImageView) convertView.findViewById(R.id.landmarkItemImage);
         mStorageRef = FirebaseStorage.getInstance().getReference().child(landmarkItem.getImage());

@@ -22,7 +22,6 @@ public class LeaderboardRecyclerViewAdapter extends RecyclerView.Adapter<ViewHol
     private ArrayList<Integer> mScores;
     private Context mContext;
 
-
     public LeaderboardRecyclerViewAdapter(Context mContext, ArrayList<String> mUsernames, ArrayList<Integer> mScores ) {
         this.mUsernames = mUsernames;
         this.mScores = mScores;

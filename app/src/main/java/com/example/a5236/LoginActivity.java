@@ -155,11 +155,11 @@ public class LoginActivity extends AppCompatActivity {
                 notFound.add(landmark);
             }
         }
-
         landmarkList.put("Not Found", notFound);
         landmarkList.put("Found", found);
         setLandmarkItemList(landmarkList);
     }
+
     public static void retrieveLeaderboardData(DataSnapshot dataSnapshot){
         DataSnapshot accounts = dataSnapshot.child("Accounts");
         HashMap<String, Object> hm = (HashMap<String, Object>) accounts.getValue();
@@ -171,7 +171,6 @@ public class LoginActivity extends AppCompatActivity {
         }
         setLeaderboard(currentLeaderboard);
     }
-
 
     private String getPhotoFilename(String username){
         return "IMG_" + username + ".jpg";
