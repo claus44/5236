@@ -48,10 +48,19 @@ public class LoginActivity extends AppCompatActivity {
     public static File photo;
     public static HashMap<String, Integer> leaderboard  = new HashMap<>();
     public static ArrayList<String> friends = new ArrayList<>();
-
+    public static Account user;
     private String response;
     public static Menu myMenu;
     private DatabaseReference mDatabase;
+
+
+    public static Account getUser() {
+        return user;
+    }
+
+    public static void setUser(Account user) {
+        LoginActivity.user = user;
+    }
 
     public static ArrayList<String> getFriends() {
         return friends;
@@ -187,7 +196,6 @@ public class LoginActivity extends AppCompatActivity {
         DataSnapshot friends = dataSnapshot.child("Friends").child(username);
         ArrayList<String> friendList = (ArrayList<String>) friends.getValue();
         setFriends(friendList);
-
     }
 
     private String getPhotoFilename(String username){
@@ -336,6 +344,9 @@ public class LoginActivity extends AppCompatActivity {
                 HashMap<String, Object> hm = (HashMap<String, Object>) ds.getValue();
                 if (hm.containsKey(username)) {
                     mDatabase.child("Accounts").child(username).removeValue();
+                    if(mDatabase.child("Friends").child(username)!=null){
+                        mDatabase.child("Friends").child(username).removeValue();
+                    }
                     userDeleted = true;
                     Toast.makeText(this, "Successfully Deleted", Toast.LENGTH_SHORT).show();
                     Intent intent = getIntent();
@@ -356,6 +367,7 @@ public class LoginActivity extends AppCompatActivity {
                     .child(LoggedInUser.getUserId()).getValue();
             if(!friendsList.contains(friend)){
                 friendsList.add(friend);
+                friends.add(friend);
                 Toast.makeText(this, "Added "+ friend+ " as a friend", Toast.LENGTH_SHORT).show();
             }else{
                 Toast.makeText(this,  friend+ " is already a friend", Toast.LENGTH_SHORT).show();
@@ -373,6 +385,7 @@ public class LoginActivity extends AppCompatActivity {
                     .child(LoggedInUser.getUserId()).getValue();
             if(friendsList.contains(friend)){
                 friendsList.remove(friend);
+                friends.remove(friend);
                 Toast.makeText(this, "Removed "+ friend+ " from friends", Toast.LENGTH_SHORT).show();
             }else{
                 Toast.makeText(this, friend+ " is not a friend", Toast.LENGTH_SHORT).show();

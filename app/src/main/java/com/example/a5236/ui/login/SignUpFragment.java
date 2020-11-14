@@ -179,6 +179,7 @@ public class SignUpFragment extends Fragment {
             ArrayList<String> friends = new ArrayList<String>();
             friends.add(username);
             mDatabase.child("Friends").child(account.getUsername()).setValue(friends);
+            LoginActivity.setUser(account);
             LoginActivity.setFriends(friends);
         }
         return userExists;

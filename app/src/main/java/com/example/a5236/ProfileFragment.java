@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,15 +74,12 @@ public class ProfileFragment extends Fragment {
                 intializeLeaderboard(isChecked);
             }
         });
-
+        userNameTextView.setText(username);
+        scoreTextView.setText("score: " + LoginActivity.getUser().getScore());
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                DataSnapshot accounts = snapshot.child("Accounts");
-                userNameTextView.setText(username);
-                String score = accounts.child(LoggedInUser.getUserId()).child("score").getValue().toString();
-                scoreTextView.setText("score: " + score);
                 LoginActivity.retrieveLeaderboardData(snapshot);
             }
 

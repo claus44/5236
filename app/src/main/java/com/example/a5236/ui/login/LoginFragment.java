@@ -165,6 +165,10 @@ public class LoginFragment extends Fragment {
                 Object value = hm.get(username);
                 if (hm.containsKey(username) && ((HashMap<String, Object>) hm.get(username)).get("password").equals(password)){
                     loginCorrect = true;
+                    Account user = new Account(username,
+                        ((HashMap<String, Object>) hm.get(username)).get("password").toString(),
+                        Integer.parseInt(((HashMap<String, Object>) hm.get(username)).get("score").toString()));
+                    LoginActivity.setUser(user);
                 }
             }
         }
