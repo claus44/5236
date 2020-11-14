@@ -300,6 +300,18 @@ public class LoginActivity extends AppCompatActivity {
 
                         } else if (id == R.id.option_update_password) {
 
+                            mDatabase = FirebaseDatabase.getInstance().getReference();
+                            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    updatePassword(snapshot, response);
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                }
+                            });
+
                         } else if (id == R.id.option_delete_account) {
                             //TODO: Handle user after account deleted
                             if (response.equals(LoggedInUser.getUserId())) {
@@ -368,6 +380,15 @@ public class LoginActivity extends AppCompatActivity {
             mDatabase.child("Friends").child(LoggedInUser.getUserId()).setValue(friendsList);
         }
 
+    }
+
+    private void updatePassword(DataSnapshot dataSnapshot, String password) {
+        //boolean updatedPassword = false;
+
+        mDatabase.child("Accounts").child(LoggedInUser.getUserId()).child("password").setValue(password);
+        //updatedPassword = true;
+
+        //return updatedPassword;
     }
 
 
