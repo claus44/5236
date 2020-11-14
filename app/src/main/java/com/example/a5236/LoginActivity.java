@@ -275,7 +275,6 @@ public class LoginActivity extends AppCompatActivity {
                             }
 
                         } else if (id == R.id.option_remove_friend) {
-
                             if (!response.equals(LoggedInUser.getUserId())) {
                                 mDatabase = FirebaseDatabase.getInstance().getReference();
                                 mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -339,6 +338,24 @@ public class LoginActivity extends AppCompatActivity {
 
     private void deleteUser(DataSnapshot dataSnapshot, String username){
         boolean userDeleted = false;
+        DataSnapshot accounts =dataSnapshot.child("Accounts");
+        DataSnapshot friends =dataSnapshot.child("Friends");
+        HashMap<String, Object> accounthm = (HashMap<String, Object>) accounts.getValue();
+        if(accounthm.containsKey(username)){
+            mDatabase.child("Accounts").child(username).removeValue();
+        }
+        if(friends.child(username) != null){
+            mDatabase.child("Friends").child(username).removeValue();
+        }
+        HashMap<String, Object> friendshm = (HashMap<String, Object>) friends.getValue();
+        for(Map.Entry<String, Object> entry : friendshm.entrySet()){
+            ArrayList<String> friendList = (ArrayList<String>) entry.getValue();
+            if(friendList.contains(username)){
+                friendList.remove(username);
+                mDatabase.child("Friends").child(entry.getKey()).setValue(friendList);
+            }
+        }
+
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             if (ds.getKey().equals("Accounts")) {
                 HashMap<String, Object> hm = (HashMap<String, Object>) ds.getValue();

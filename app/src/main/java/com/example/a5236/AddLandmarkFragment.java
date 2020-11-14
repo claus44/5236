@@ -213,7 +213,7 @@ public class AddLandmarkFragment extends Fragment {
         public void afterTextChanged(Editable s) {
             int checksPassed = 0;
             if(titleEditText.getText().toString().length()!=0 ){
-                if(!titleEditText.getText().toString().matches("[\\dA-Za-z]+")){
+                if(!titleEditText.getText().toString().matches("[\\dA-Za-z ]+")){
                     Toast.makeText(getContext().getApplicationContext(), "Title can only contain letters and digits", Toast.LENGTH_SHORT).show();
                     titleEditText.setError(mContext.getResources().getString(R.string.title_error));
                 }else {
