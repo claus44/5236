@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:weightSum="100"
+    android:id="@+id/parent_layout">
+
+        <TextView
+            android:id="@+id/username_and_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="-2dp"
+            android:text="user1"
+            android:textColor="#000"
+            android:textSize="17sp" />
+
+</LinearLayout>

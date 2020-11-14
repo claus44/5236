@@ -11,7 +11,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,8 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a5236.Account;
-import com.example.a5236.Landmark;
-import com.example.a5236.LandmarkActivity;
 import com.example.a5236.LoginActivity;
 import com.example.a5236.R;
 import com.example.a5236.data.model.LoggedInUser;
@@ -35,6 +32,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SignUpFragment extends Fragment {
@@ -43,7 +41,9 @@ public class SignUpFragment extends Fragment {
     private DatabaseReference mDatabase;
     private LoggedInUser user;
     private static final String TAG = "SignUpFragment";
-
+    private ProgressBar loadingProgressBar;
+    private EditText usernameEditText, passwordEditText,passwordConfirmationEditText;
+    private Button signUpButton,loginButton;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -58,14 +58,12 @@ public class SignUpFragment extends Fragment {
         signUpViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = view.findViewById(R.id.username);
-        final EditText passwordEditText = view.findViewById(R.id.password);
-        final EditText passwordConfirmationEditText = view.findViewById(R.id.passwordConfirmation);
-        final Button signUpButton = view.findViewById(R.id.signup);
-        final Button loginButton = view.findViewById(R.id.login);
-        final Button updatePassword = view.findViewById(R.id.update_password);
-        final Button deleteUser = view.findViewById(R.id.deleteUser);
-        final ProgressBar loadingProgressBar = view.findViewById(R.id.loading);
+        usernameEditText = view.findViewById(R.id.username);
+        passwordEditText = view.findViewById(R.id.password);
+        passwordConfirmationEditText = view.findViewById(R.id.passwordConfirmation);
+        signUpButton = view.findViewById(R.id.signup);
+        loginButton = view.findViewById(R.id.login);
+        loadingProgressBar = view.findViewById(R.id.loading);
 
         signUpViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
             @Override
@@ -127,9 +125,7 @@ public class SignUpFragment extends Fragment {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                    signUpViewModel.register(usernameEditText.getText().toString(),
-//                            passwordEditText.getText().toString(),
-//                            passwordConfirmationEditText.getText().toString());
+                    signUp();
                 }
                 return false;
             }
@@ -138,34 +134,7 @@ public class SignUpFragment extends Fragment {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                final String username = usernameEditText.getText().toString();
-                final String password = passwordEditText.getText().toString();
-                String passwordConfirm = passwordConfirmationEditText.getText().toString();
-                if(password.equals(passwordConfirm)){
-                    mDatabase = FirebaseDatabase.getInstance().getReference();
-                    user = new LoggedInUser(username);
-                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            boolean userExists = checkUsernameExists(snapshot, username, password);
-                            if(!userExists){
-                                signUpViewModel.register(true, user, true);
-                                LoginActivity.setLoggedInUser(user);
-                                LoginActivity.retrieveLandmarkData(snapshot);
-                                NavHostFragment.findNavController(SignUpFragment.this)
-                                    .navigate(R.id.action_signUpFragment_to_landmarkActivity);
-                            }else{
-                                signUpViewModel.register(true, user, false);
-                                loadingProgressBar.setVisibility(View.GONE);
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) { }
-                    });
-                }else{
-                    signUpViewModel.register(false, user, false);
-                }
+                signUp();
             }
         });
 
@@ -176,77 +145,10 @@ public class SignUpFragment extends Fragment {
                         .navigate(R.id.action_signUpFragment_to_loginFragment);
             }
         });
-
-        //TODO: Move into profile fragment and fix username variable
-        updatePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                // finding username will be changed to the logged in user - there will be no text field
-                final String username = usernameEditText.getText().toString();
-                final String password = passwordEditText.getText().toString();
-                String passwordConfirm = passwordConfirmationEditText.getText().toString();
-                // this if won't need to check for username empty later
-                if(!password.equals("") && signUpViewModel.updatePasswordMatch(password, passwordConfirm) && !username.equals("")){
-                    mDatabase = FirebaseDatabase.getInstance().getReference();
-                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            boolean updatedPassword = updateUserCheck(snapshot, username, password);
-                            if(updatedPassword){
-                                NavHostFragment.findNavController(SignUpFragment.this)
-                                        .navigate(R.id.action_signUpFragment_to_landmarkActivity);
-                            }else{
-                                loadingProgressBar.setVisibility(View.GONE);
-                                Toast.makeText((LoginActivity) getActivity(),"Update Failed: User does not exist",Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) { }
-                    });
-                }else{
-                    loadingProgressBar.setVisibility(View.GONE);
-                    Toast.makeText((LoginActivity) getActivity(),"Cannot update with blank information",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        //TODO: Move into profile fragment (this will just be a button -will not make user confirm password)
-        // and fix username variable
-        deleteUser.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                // finding username will be changed to the logged in user - there will be no text field
-                final String username = usernameEditText.getText().toString();
-                // this if and else won't be necessary later
-                if(!username.equals("")){
-                    mDatabase = FirebaseDatabase.getInstance().getReference();
-                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            boolean userDeleted = deleteUser(snapshot, username);
-                            if(userDeleted){
-                                loadingProgressBar.setVisibility(View.GONE);
-                                Toast.makeText((LoginActivity) getActivity(),"Successfully Deleted "+username,Toast.LENGTH_SHORT).show();
-                            }else{
-                                loadingProgressBar.setVisibility(View.GONE);
-                                Toast.makeText((LoginActivity) getActivity(),"Delete Failed: User does not exist",Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) { }
-                    });
-                }else {
-                    loadingProgressBar.setVisibility(View.GONE);
-                    Toast.makeText((LoginActivity) getActivity(), "Username is blank", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + " "+ model.getDisplayName();
-        // TODO : initiate successful sign up in experience
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(getContext().getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         }
@@ -271,36 +173,47 @@ public class SignUpFragment extends Fragment {
         if (!userExists) {
             Account account = new Account(username, password, 0);
             mDatabase.child("Accounts").child(account.getUsername()).setValue(account);
+            //create entry with username set as value
+            mDatabase.child("Friends").child(account.getUsername()).setValue(username);
+            //change value to arraylist. automatically includes their own name
+            ArrayList<String> friends = new ArrayList<String>();
+            friends.add(username);
+            mDatabase.child("Friends").child(account.getUsername()).setValue(friends);
+            LoginActivity.setUser(account);
+            LoginActivity.setFriends(friends);
         }
         return userExists;
     }
-    // TODO: move to profile fragment for updating password for user
-    private boolean updateUserCheck(DataSnapshot dataSnapshot, String username, String password) {
-        boolean updatedPassword = false;
-        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-            if (ds.getKey().equals("Accounts")) {
-                HashMap<String, Object> hm = (HashMap<String, Object>) ds.getValue();
-                if(hm.containsKey(username)){
-                    Account updatedAccount = new Account(username, password,  Integer.parseInt(((HashMap<String, Object>) hm.get(username)).get("score").toString()));
-                    mDatabase.child("Accounts").child(username).setValue(updatedAccount);
-                    updatedPassword = true;
-                 }
-            }
-        }
-        return updatedPassword;
-    }
-    // TODO: move to profile fragment for deleting user
-    private boolean deleteUser(DataSnapshot dataSnapshot, String username){
-        boolean userDeleted = false;
-        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-            if (ds.getKey().equals("Accounts")) {
-                HashMap<String, Object> hm = (HashMap<String, Object>) ds.getValue();
-                if (hm.containsKey(username)) {
-                    mDatabase.child("Accounts").child(username).removeValue();
-                    userDeleted = true;
+
+    private void signUp(){
+        loadingProgressBar.setVisibility(View.VISIBLE);
+        final String username = usernameEditText.getText().toString();
+        final String password = passwordEditText.getText().toString();
+        String passwordConfirm = passwordConfirmationEditText.getText().toString();
+        if(password.equals(passwordConfirm)){
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            user = new LoggedInUser(username);
+            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    boolean userExists = checkUsernameExists(snapshot, username, password);
+                    if(!userExists){
+                        signUpViewModel.register(true, user, true);
+                        LoginActivity.setLoggedInUser(user);
+                        LoginActivity.retrieveLandmarkData(snapshot);
+                        LoginActivity.retrieveLeaderboardData(snapshot);
+                        NavHostFragment.findNavController(SignUpFragment.this)
+                                .navigate(R.id.action_signUpFragment_to_landmarkActivity);
+                    }else{
+                        signUpViewModel.register(true, user, false);
+                        loadingProgressBar.setVisibility(View.GONE);
+                    }
                 }
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) { }
+            });
+        }else{
+            signUpViewModel.register(false, user, false);
         }
-        return userDeleted;
     }
 }
