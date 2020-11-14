@@ -3,6 +3,7 @@ package com.example.a5236;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 
@@ -46,10 +47,19 @@ public class LoginActivity extends AppCompatActivity {
     public static HashMap<String, List<Landmark>> landmarkItemList;
     public static File photo;
     public static HashMap<String, Integer> leaderboard  = new HashMap<>();
+    public static ArrayList<String> friends = new ArrayList<>();
+
     private String response;
     public static Menu myMenu;
     private DatabaseReference mDatabase;
 
+    public static ArrayList<String> getFriends() {
+        return friends;
+    }
+
+    public static void setFriends(ArrayList<String> friends) {
+        LoginActivity.friends = friends;
+    }
     public static HashMap<String, Integer> getLeaderboard() {
         return sortByScore(leaderboard);
     }
@@ -173,6 +183,13 @@ public class LoginActivity extends AppCompatActivity {
         setLeaderboard(currentLeaderboard);
     }
 
+    public static void retrieveFriendData(DataSnapshot dataSnapshot, String username){
+        DataSnapshot friends = dataSnapshot.child("Friends").child(username);
+        ArrayList<String> friendList = (ArrayList<String>) friends.getValue();
+        setFriends(friendList);
+
+    }
+
     private String getPhotoFilename(String username){
         return "IMG_" + username + ".jpg";
     }
@@ -193,6 +210,7 @@ public class LoginActivity extends AppCompatActivity {
         myMenu.findItem(R.id.option_remove_friend).setVisible(false);
         myMenu.findItem(R.id.option_delete_account).setVisible(false);
         myMenu.findItem(R.id.option_update_password).setVisible(false);
+        myMenu.findItem(R.id.option_logout_account).setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -201,43 +219,6 @@ public class LoginActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         showAddItemDialog(id);
-
-//        if (id == R.id.option_add_friend) {
-//
-//        }
-//        else if (id == R.id.option_remove_friend) {
-//            showAddItemDialog("Remove Friend", id);
-//
-//            System.out.println(LoggedInUser.getUserId());
-//
-//
-//        }
-//        else if (id == R.id.option_delete_account) {
-//            showAddItemDialog("Are You sure? Enter your Username to confirm.", id);
-//
-//            if (response.equals(LoggedInUser.getUserId())) {
-//                mDatabase = FirebaseDatabase.getInstance().getReference();
-//                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                        boolean userDeleted = deleteUser(snapshot, response);
-//                        if (userDeleted) {
-//                            //TODO: restart app
-//                            //Toast.makeText(LoginActivity, "Successfully Deleted " + response, Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            //Can't happen... maybe. If the loggedInUser doesn't exist in the db, this would happen
-//                            //Toast.makeText((LoginActivity) getActivity(), "Delete Failed: User does not exist", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) {
-//                    }
-//                });
-//
-//
-//            }
-//        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -257,6 +238,9 @@ public class LoginActivity extends AppCompatActivity {
         } else if (id == R.id.option_update_password) {
             title = "Update Password";
             message = "Enter your new password";
+        }else if(id == R.id.option_logout_account){
+            title = "Logout";
+            message = "Sure you want to logout?";
         }
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(title)
@@ -313,20 +297,12 @@ public class LoginActivity extends AppCompatActivity {
                             });
 
                         } else if (id == R.id.option_delete_account) {
-                            //TODO: Handle user after account deleted
                             if (response.equals(LoggedInUser.getUserId())) {
                                 mDatabase = FirebaseDatabase.getInstance().getReference();
                                 mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        boolean userDeleted = deleteUser(snapshot, response);
-                                        if (userDeleted) {
-                                            //TODO: restart app
-                                            //Toast.makeText(LoginActivity, "Successfully Deleted " + response, Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            //Can't happen... maybe. If the loggedInUser doesn't exist in the db, this would happen
-                                            //Toast.makeText((LoginActivity) getActivity(), "Delete Failed: User does not exist", Toast.LENGTH_SHORT).show();
-                                        }
+                                        deleteUser(snapshot, response);
                                     }
 
                                     @Override
@@ -336,6 +312,13 @@ public class LoginActivity extends AppCompatActivity {
 
 
                             }
+                        }else if (id == R.id.option_logout_account) {
+                            if (response.equals(LoggedInUser.getUserId())) {
+                                setLoggedInUser(null);
+                                Intent intent = getIntent();
+                                finish();
+                                startActivity(intent);
+                            }
                         }
 
                     }
@@ -343,11 +326,10 @@ public class LoginActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .create();
         dialog.show();
-//        System.out.println(response);
 
     }
 
-    private boolean deleteUser(DataSnapshot dataSnapshot, String username){
+    private void deleteUser(DataSnapshot dataSnapshot, String username){
         boolean userDeleted = false;
         for (DataSnapshot ds : dataSnapshot.getChildren()) {
             if (ds.getKey().equals("Accounts")) {
@@ -355,10 +337,16 @@ public class LoginActivity extends AppCompatActivity {
                 if (hm.containsKey(username)) {
                     mDatabase.child("Accounts").child(username).removeValue();
                     userDeleted = true;
+                    Toast.makeText(this, "Successfully Deleted", Toast.LENGTH_SHORT).show();
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
                 }
             }
         }
-        return userDeleted;
+        if(!userDeleted){
+            Toast.makeText(this, "Failed to Delete", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -366,8 +354,15 @@ public class LoginActivity extends AppCompatActivity {
         if (snapshot.child("Accounts").child(friend).getValue() != null) {
             ArrayList<String> friendsList = (ArrayList<String>) snapshot.child("Friends")
                     .child(LoggedInUser.getUserId()).getValue();
-            friendsList.add(friend);
+            if(!friendsList.contains(friend)){
+                friendsList.add(friend);
+                Toast.makeText(this, "Added "+ friend+ " as a friend", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this,  friend+ " is already a friend", Toast.LENGTH_SHORT).show();
+            }
             mDatabase.child("Friends").child(LoggedInUser.getUserId()).setValue(friendsList);
+        }else{
+            Toast.makeText(this,  friend+ " does not exist", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -376,19 +371,26 @@ public class LoginActivity extends AppCompatActivity {
         if (snapshot.child("Accounts").child(friend).getValue() != null) {
             ArrayList<String> friendsList = (ArrayList<String>) snapshot.child("Friends")
                     .child(LoggedInUser.getUserId()).getValue();
-            friendsList.remove(friend);
+            if(friendsList.contains(friend)){
+                friendsList.remove(friend);
+                Toast.makeText(this, "Removed "+ friend+ " from friends", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, friend+ " is not a friend", Toast.LENGTH_SHORT).show();
+            }
             mDatabase.child("Friends").child(LoggedInUser.getUserId()).setValue(friendsList);
+        }else{
+            Toast.makeText(this,  friend+ " does not exist", Toast.LENGTH_SHORT).show();
         }
 
     }
 
     private void updatePassword(DataSnapshot dataSnapshot, String password) {
-        //boolean updatedPassword = false;
-
-        mDatabase.child("Accounts").child(LoggedInUser.getUserId()).child("password").setValue(password);
-        //updatedPassword = true;
-
-        //return updatedPassword;
+        if(mDatabase.child("Accounts").child(LoggedInUser.getUserId()) != null){
+            mDatabase.child("Accounts").child(LoggedInUser.getUserId()).child("password").setValue(password);
+            Toast.makeText(this,  "Successfully updated password ", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this,  "Failed to update password", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

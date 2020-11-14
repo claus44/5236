@@ -67,6 +67,7 @@ public class LandmarksListFragment extends Fragment {
         LoginActivity.myMenu.findItem(R.id.option_remove_friend).setVisible(true);
         LoginActivity.myMenu.findItem(R.id.option_delete_account).setVisible(true);
         LoginActivity.myMenu.findItem(R.id.option_update_password).setVisible(true);
+        LoginActivity.myMenu.findItem(R.id.option_logout_account).setVisible(true);
 
         prepareLandmarkInfo();
 

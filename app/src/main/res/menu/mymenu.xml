@@ -15,4 +15,9 @@
         android:id="@+id/option_delete_account"
         android:title="Delete Account"
         android:visible="true" />
+
+    <item
+        android:id="@+id/option_logout_account"
+        android:title="Logout"
+        android:visible="true" />
 </menu>

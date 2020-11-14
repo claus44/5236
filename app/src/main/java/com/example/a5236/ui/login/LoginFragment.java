@@ -185,6 +185,7 @@ public class LoginFragment extends Fragment {
                     LoginActivity.setLoggedInUser(user);
                     LoginActivity.retrieveLandmarkData(snapshot);
                     LoginActivity.retrieveLeaderboardData(snapshot);
+                    LoginActivity.retrieveFriendData(snapshot, username);
                     NavHostFragment.findNavController(LoginFragment.this)
                             .navigate(R.id.action_loginFragment_to_landmarkActivity);
                 }else{

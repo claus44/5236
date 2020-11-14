@@ -95,7 +95,18 @@ public class ProfileFragment extends Fragment {
         ArrayList<String> usernames = new ArrayList<>(LoginActivity.getLeaderboard().keySet());
         ArrayList<Integer> scores = new ArrayList<>(LoginActivity.getLeaderboard().values());
         if(friendsOnly){
-            //reset usernames and scores
+            ArrayList<String> friends = LoginActivity.getFriends();
+            ArrayList<String> usernamesTemp = new ArrayList<>();
+            ArrayList<Integer> scoresTemp = new ArrayList<>();
+            for(int i =0; i<usernames.size(); i++){
+                if(friends.contains(usernames.get(i))){
+                    usernamesTemp.add(usernames.get(i));
+                    scoresTemp.add(scores.get(i));
+                }
+            }
+            usernames = usernamesTemp;
+            scores = scoresTemp;
+
         }
         LeaderboardRecyclerViewAdapter adapter = new LeaderboardRecyclerViewAdapter(mContext,usernames, scores);
         leaderboardRecyclerView.setAdapter(adapter);
