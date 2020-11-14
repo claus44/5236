@@ -284,6 +284,20 @@ public class LoginActivity extends AppCompatActivity {
 
                         } else if (id == R.id.option_remove_friend) {
 
+                            if (!response.equals(LoggedInUser.getUserId())) {
+                                mDatabase = FirebaseDatabase.getInstance().getReference();
+                                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        removeFriend(response, snapshot);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                    }
+                                });
+                            }
+
                         } else if (id == R.id.option_update_password) {
 
                         } else if (id == R.id.option_delete_account) {
@@ -340,8 +354,17 @@ public class LoginActivity extends AppCompatActivity {
         if (snapshot.child("Accounts").child(friend).getValue() != null) {
             ArrayList<String> friendsList = (ArrayList<String>) snapshot.child("Friends")
                     .child(LoggedInUser.getUserId()).getValue();
-            System.out.println(friendsList.toString());
             friendsList.add(friend);
+            mDatabase.child("Friends").child(LoggedInUser.getUserId()).setValue(friendsList);
+        }
+
+    }
+
+    private void removeFriend (String friend, DataSnapshot snapshot){
+        if (snapshot.child("Accounts").child(friend).getValue() != null) {
+            ArrayList<String> friendsList = (ArrayList<String>) snapshot.child("Friends")
+                    .child(LoggedInUser.getUserId()).getValue();
+            friendsList.remove(friend);
             mDatabase.child("Friends").child(LoggedInUser.getUserId()).setValue(friendsList);
         }
 
