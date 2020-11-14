@@ -2,7 +2,6 @@ package com.example.a5236;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,8 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +21,7 @@ public class LandmarkListAdapter extends BaseExpandableListAdapter {
     private Context mContext;
     private List<String> mLandmarkGroupTitleList;
     private HashMap<String, List<Landmark>> mLandmarkListGroupedItems;
+    private StorageReference mStorageRef;
 
     public LandmarkListAdapter(Context mContext, List<String> mLandmarkGroupTitleList, HashMap<String, List<Landmark>> mLandmarkListGroupedItems) {
         this.mContext = mContext;
@@ -84,20 +85,24 @@ public class LandmarkListAdapter extends BaseExpandableListAdapter {
             LayoutInflater inflater = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.landmark_list_item,  parent,false);
         }
-        //Change later with Firebase linked
         TextView tvLandmarkItemTitle = (TextView) convertView.findViewById(R.id.landmarkListItemTitle);
         tvLandmarkItemTitle.setText(landmarkItem.getTitle());
         TextView tvLandmarkItemDesc = (TextView) convertView.findViewById(R.id.landmarkListItemDescription);
-        tvLandmarkItemDesc.setText(landmarkItem.getDescription());
-        ImageView ivLandmarkItemImage = (ImageView) convertView.findViewById(R.id.landmarkItemImage);
+        if(landmarkItem.getDescription().length() > 60){
+            tvLandmarkItemDesc.setText(landmarkItem.getDescription().substring(0,60) + "...");
+        }else{
+            tvLandmarkItemDesc.setText(landmarkItem.getDescription());
+        }
 
-        //Change later with Firebase linked
-        Glide.with(mContext).load("https://icons-for-free.com/iconfiles/png/512/file-131964752888364301.png").into(ivLandmarkItemImage);
+        ImageView ivLandmarkItemImage = (ImageView) convertView.findViewById(R.id.landmarkItemImage);
+        mStorageRef = FirebaseStorage.getInstance().getReference().child(landmarkItem.getImage());
+        GlideApp.with(mContext).load(mStorageRef).into(ivLandmarkItemImage);
+
         return convertView;
     }
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return true;
     }
 }

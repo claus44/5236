@@ -11,6 +11,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +23,27 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.a5236.Account;
+import com.example.a5236.LoginActivity;
 import com.example.a5236.R;
+import com.example.a5236.data.model.LoggedInUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 public class LoginFragment extends Fragment {
 
     private LoginViewModel loginViewModel;
+    private DatabaseReference mDatabase;
+    private LoggedInUser user;
+    private static final String TAG = "LoginFragment";
+    private EditText usernameEditText, passwordEditText;
+    private Button loginButton, registerButton;
+    private ProgressBar loadingProgressBar;
 
     @Nullable
     @Override
@@ -42,11 +59,11 @@ public class LoginFragment extends Fragment {
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        final EditText usernameEditText = view.findViewById(R.id.username);
-        final EditText passwordEditText = view.findViewById(R.id.password);
-        final Button loginButton = view.findViewById(R.id.signup);
-        final Button registerButton = view.findViewById(R.id.register);
-        final ProgressBar loadingProgressBar = view.findViewById(R.id.loading);
+        usernameEditText = view.findViewById(R.id.username);
+        passwordEditText = view.findViewById(R.id.password);
+        loginButton = view.findViewById(R.id.signup);
+        registerButton = view.findViewById(R.id.register);
+        loadingProgressBar = view.findViewById(R.id.loading);
 
         loginViewModel.getLoginFormState().observe(getViewLifecycleOwner(), new Observer<LoginFormState>() {
             @Override
@@ -100,12 +117,10 @@ public class LoginFragment extends Fragment {
         usernameEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.addTextChangedListener(afterTextChangedListener);
         passwordEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
-                            passwordEditText.getText().toString());
+                    login();
                 }
                 return false;
             }
@@ -114,13 +129,7 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                if(loginViewModel.login(usernameEditText.getText().toString(),
-                        passwordEditText.getText().toString())){
-                    NavHostFragment.findNavController(LoginFragment.this)
-                            .navigate(R.id.action_loginFragment_to_landmarkActivity);
-                }
-
+                login();
             }
         });
 
@@ -134,8 +143,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void updateUiWithUser(LoggedInUserView model) {
-        String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
+        String welcome = getString(R.string.welcome) + " " + model.getDisplayName();
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(getContext().getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         }
@@ -148,5 +156,49 @@ public class LoginFragment extends Fragment {
                     errorString,
                     Toast.LENGTH_LONG).show();
         }
+    }
+    private boolean checkUsernameAndPassword(DataSnapshot dataSnapshot, String username, String password) {
+        boolean loginCorrect = false;
+        for (DataSnapshot ds : dataSnapshot.getChildren()){
+            if (ds.getKey().equals("Accounts")){
+                HashMap<String, Object> hm = (HashMap<String, Object>) ds.getValue();
+                Object value = hm.get(username);
+                if (hm.containsKey(username) && ((HashMap<String, Object>) hm.get(username)).get("password").equals(password)){
+                    loginCorrect = true;
+                    Account user = new Account(username,
+                        ((HashMap<String, Object>) hm.get(username)).get("password").toString(),
+                        Integer.parseInt(((HashMap<String, Object>) hm.get(username)).get("score").toString()));
+                    LoginActivity.setUser(user);
+                }
+            }
+        }
+        return loginCorrect;
+    }
+    private void login(){
+        loadingProgressBar.setVisibility(View.VISIBLE);
+        final String username = usernameEditText.getText().toString();
+        final String password = passwordEditText.getText().toString();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        user = new LoggedInUser(username);
+        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean loginCorrect = checkUsernameAndPassword(snapshot, username, password);
+                if(loginCorrect){
+                    loginViewModel.login(loginCorrect, user);
+                    LoginActivity.setLoggedInUser(user);
+                    LoginActivity.retrieveLandmarkData(snapshot);
+                    LoginActivity.retrieveLeaderboardData(snapshot);
+                    LoginActivity.retrieveFriendData(snapshot, username);
+                    NavHostFragment.findNavController(LoginFragment.this)
+                            .navigate(R.id.action_loginFragment_to_landmarkActivity);
+                }else{
+                    loginViewModel.login(loginCorrect, user);
+                    loadingProgressBar.setVisibility(View.GONE);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
     }
 }

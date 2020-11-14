@@ -29,37 +29,36 @@ public class LoginViewModel extends ViewModel {
         return loginResult;
     }
 
-    public boolean login(String username, String password) {
-        // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.login(username, password);
-
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-            return true;
-        } else {
+    public void login(boolean loginComplete, LoggedInUser data ){
+        if(loginComplete){
+            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getUserId())));
+            loginRepository.login(loginComplete,data);
+        }else{
             loginResult.setValue(new LoginResult(R.string.login_failed));
-            return false;
         }
     }
 
-    public boolean register(String username, String password, String passwordConfirmation) {
-        // can be launched in a separate asynchronous job
-        if(!password.equals(passwordConfirmation)) {
+    public void register(boolean passwordMatch, LoggedInUser data, boolean userCreated){
+        if(!passwordMatch){
             loginResult.setValue(new LoginResult(R.string.password_confirmation_failed));
-            return false;
-        } else {
-            Result<LoggedInUser> result = loginRepository.login(username, password);
-
-            if (result instanceof Result.Success) {
-                LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-                loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-                return true;
-            } else {
+        }else{
+            if(userCreated){
+                loginResult.setValue(new LoginResult(new LoggedInUserView(data.getUserId())));
+                loginRepository.register(userCreated,data);
+            }else{
                 loginResult.setValue(new LoginResult(R.string.registration_failed));
-                return false;
+                loginRepository.register(userCreated,data);
             }
         }
+    }
+
+    public boolean updatePasswordMatch(String password, String passwordConfirmation) {
+        boolean passwordsMatch = true;
+        if (!password.equals(passwordConfirmation)) {
+            loginResult.setValue(new LoginResult(R.string.password_confirmation_failed));
+            passwordsMatch = false;
+        }
+        return passwordsMatch;
     }
 
     public void loginDataChanged(String username, String password) {
@@ -100,4 +99,5 @@ public class LoginViewModel extends ViewModel {
     private boolean isPasswordValid(String password) {
         return password != null && password.trim().length() > 5;
     }
+
 }

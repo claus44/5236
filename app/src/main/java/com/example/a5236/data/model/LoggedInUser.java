@@ -5,19 +5,14 @@ package com.example.a5236.data.model;
  */
 public class LoggedInUser {
 
-    private String userId;
-    private String displayName;
+    private static String userId;
 
-    public LoggedInUser(String userId, String displayName) {
+    public LoggedInUser(String userId) {
         this.userId = userId;
-        this.displayName = displayName;
     }
 
-    public String getUserId() {
+    public static String getUserId() {
         return userId;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
 }
