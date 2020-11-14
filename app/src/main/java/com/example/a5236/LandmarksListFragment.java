@@ -41,17 +41,14 @@ public class LandmarksListFragment extends Fragment {
     private static final String TAG = "LandmarksListFragment";
     private static final String notFound = "Not Found";
     private static final String Found = "Found";
-    Context mContext;
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     List<String> landmarkGroupList;
     HashMap<String, List<Landmark>> landmarkItemList;
 
-    private DatabaseReference mDatabase;
-
     private static final int Image_Capture_Code = 1;
     private final int PERMISSION_REQUEST_CODE_CAMERA = 2;
-    ImageView mImageView;
+    private final int PERMISSION_REQUEST_CODE_STORAGE = 5;
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -105,7 +102,6 @@ public class LandmarksListFragment extends Fragment {
 
                 NavHostFragment.findNavController(LandmarksListFragment.this)
                         .navigate(R.id.action_landmarksListFragment_to_landmarkFragment);
-                //TODO: pass landmark clicked on
                 Log.d(TAG, "CHILD CLICK LISTENER TODO");
                 return false;
             }
@@ -116,17 +112,13 @@ public class LandmarksListFragment extends Fragment {
             public void onClick(View v) {
                 NavHostFragment.findNavController(LandmarksListFragment.this)
                         .navigate(R.id.action_landmarksListFragment_to_profileFragment);
-
             }
         });
+
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CODE_CAMERA );
-//                Uri uri = FileProvider.getUriForFile(getActivity(), "com.example.a5236.fileprovider", LoginActivity.getPhoto());
-//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-//                startActivityForResult(intent,Image_Capture_Code);
             }
         });
     }
@@ -136,17 +128,24 @@ public class LandmarksListFragment extends Fragment {
             case PERMISSION_REQUEST_CODE_CAMERA:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Uri uri = FileProvider.getUriForFile(getActivity(), "com.example.a5236.fileprovider", LoginActivity.getPhoto());
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-                    startActivityForResult(intent,Image_Capture_Code);
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE_STORAGE );
                 }else {
                     Toast.makeText(getActivity(), "Need Camera Access", Toast.LENGTH_SHORT).show();
                 }
                 return;
+            case PERMISSION_REQUEST_CODE_STORAGE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Uri uri = FileProvider.getUriForFile(getActivity(), "com.example.a5236.fileprovider", LoginActivity.getPhoto());
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                    startActivityForResult(intent,Image_Capture_Code);
+
+                }else {
+                    Toast.makeText(getActivity(), "Need Storage Access", Toast.LENGTH_SHORT).show();
+                }
+                return;
         }
-        // Other 'case' lines to check for other
-        // permissions this app might request.
     }
 
     @Override
@@ -162,6 +161,7 @@ public class LandmarksListFragment extends Fragment {
             }
         }
     }
+
     private void prepareLandmarkInfo(){
         landmarkGroupList = new ArrayList<String>();
         landmarkGroupList.add("Not Found");

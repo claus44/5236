@@ -27,7 +27,11 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,17 +45,17 @@ public class LoginActivity extends AppCompatActivity {
     public static LoggedInUser loggedInUser;
     public static HashMap<String, List<Landmark>> landmarkItemList;
     public static File photo;
-    public static HashMap<String, String> leaderboard;
+    public static HashMap<String, Integer> leaderboard  = new HashMap<>();
     private String response;
     public static Menu myMenu;
     private DatabaseReference mDatabase;
 
-    public static HashMap<String, String> getLeaderboard() {
-        return leaderboard;
+    public static HashMap<String, Integer> getLeaderboard() {
+        return sortByScore(leaderboard);
     }
 
-    public static void setLeaderboard(HashMap<String, String> leaderboard) {
-        LoginActivity.leaderboard = leaderboard;
+    public static void setLeaderboard(HashMap<String, Integer> leaderboard) {
+        LoginActivity.leaderboard = sortByScore(leaderboard);
     }
 
     public static File getPhoto() {
@@ -131,7 +135,6 @@ public class LoginActivity extends AppCompatActivity {
 
     public static void retrieveLandmarkData(DataSnapshot dataSnapshot){
         HashMap<String, List<Landmark>> landmarkList = new HashMap<String, List<Landmark>>();
-        //initialize group names
 
         List<Landmark> notFound = new ArrayList<Landmark>();
         List<Landmark> found = new ArrayList<Landmark>();
@@ -153,12 +156,22 @@ public class LoginActivity extends AppCompatActivity {
                 notFound.add(landmark);
             }
         }
-
         landmarkList.put("Not Found", notFound);
         landmarkList.put("Found", found);
         setLandmarkItemList(landmarkList);
     }
 
+    public static void retrieveLeaderboardData(DataSnapshot dataSnapshot){
+        DataSnapshot accounts = dataSnapshot.child("Accounts");
+        HashMap<String, Object> hm = (HashMap<String, Object>) accounts.getValue();
+        HashMap<String, Integer> currentLeaderboard = getLeaderboard();
+        for (String key: hm.keySet()) {
+            HashMap<String, Object> value = (HashMap<String, Object>) hm.get(key);
+            int scoreValue = Integer.parseInt(value.get("score").toString());
+            currentLeaderboard.put(key, scoreValue);
+        }
+        setLeaderboard(currentLeaderboard);
+    }
 
     private String getPhotoFilename(String username){
         return "IMG_" + username + ".jpg";
@@ -322,6 +335,7 @@ public class LoginActivity extends AppCompatActivity {
         return userDeleted;
     }
 
+
     private void addFriend (String friend, DataSnapshot snapshot){
         if (snapshot.child("Accounts").child(friend).getValue() != null) {
             ArrayList<String> friendsList = (ArrayList<String>) snapshot.child("Friends")
@@ -333,5 +347,19 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+
+    public static HashMap<String, Integer> sortByScore(HashMap<String, Integer> hm) {
+        List<Map.Entry<String, Integer> > list = new LinkedList<Map.Entry<String, Integer> >(hm.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer> >() {
+            public int compare(Map.Entry<String, Integer> n1, Map.Entry<String, Integer> n2) {
+                return (n2.getValue()).compareTo(n1.getValue());
+            }
+        });
+        HashMap<String, Integer> sorted = new LinkedHashMap<String, Integer>();
+        for (Map.Entry<String, Integer> pair : list) {
+            sorted.put(pair.getKey(), pair.getValue());
+        }
+        return sorted;
+    }
 
 }

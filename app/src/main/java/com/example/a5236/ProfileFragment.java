@@ -4,11 +4,14 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.a5236.data.model.LoggedInUser;
@@ -17,53 +20,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import android.widget.TextView;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ProfileFragment extends Fragment {
-
+    private static final String TAG = "ProfileFragment";
     private TextView scoreTextView, userNameTextView;
-
-    private FirebaseDatabase database;
-    private DatabaseReference mDatabase;
-    private static final String USERS = "Accounts";
+    private RecyclerView leaderboardRecyclerView;
+    private LoginActivity mContext;
     private String username;
 
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     public ProfileFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(String param1, String param2) {
+    public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -71,68 +43,46 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-
-        //get username from data/model/LoggedInUser
+        mContext = (LoginActivity) getActivity();
         username = LoggedInUser.getUserId();
 
-        scoreTextView = getView().findViewById(R.id.score_textview);
-        userNameTextView = getView().findViewById(R.id.username_textview);
-        //leaderboardRecyclerView = getView().findViewById(R.id.leaderboard_recyclerview);
+        scoreTextView = view.findViewById(R.id.score_textview);
+        userNameTextView = view.findViewById(R.id.username_textview);
 
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference userRef = rootRef.child(USERS);
-        Log.v("USERID", userRef.getKey());
+        leaderboardRecyclerView = view.findViewById(R.id.recycler_view);
+        ArrayList<String> usernames = new ArrayList<>(LoginActivity.getLeaderboard().keySet());
+        ArrayList<Integer> scores = new ArrayList<>(LoginActivity.getLeaderboard().values());
+        LeaderboardRecyclerViewAdapter adapter = new LeaderboardRecyclerViewAdapter(mContext,usernames, scores);
+        leaderboardRecyclerView.setAdapter(adapter);
+        leaderboardRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 
-        userRef.addValueEventListener(new ValueEventListener() {
+        Switch friendFilter = (Switch) view.findViewById(R.id.friend_filter);
+        friendFilter.setChecked(false);
+        friendFilter.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                intializeLeaderboard(isChecked);
+            }
+        });
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                //set the profile page's textboxes from
+                DataSnapshot accounts = snapshot.child("Accounts");
                 userNameTextView.setText(username);
-                String score = snapshot.child(LoggedInUser.getUserId()).child("score").getValue().toString();
+                String score = accounts.child(LoggedInUser.getUserId()).child("score").getValue().toString();
                 scoreTextView.setText("score: " + score);
-
-
-                HashMap<String, Object> hm = (HashMap<String, Object>) snapshot.getValue();
-                for (String key: hm.keySet()) {
-                    HashMap<String, Object> value = (HashMap<String, Object>) hm.get(key);
-                    String scoreValue = value.get("score").toString();
-                    HashMap<String, String> x = LoginActivity.getLeaderboard();
-                    x.put(key, scoreValue);
-                    LoginActivity.setLeaderboard(x);
-                }
-
-//                for (DataSnapshot ds : dataSnapshot.getChildren()) {
-//                    if (ds.getKey().equals("Accounts")) {
-//                        HashMap<String, Object> hm = (HashMap<String, Object>) ds.getValue();
-//                        if(hm.containsKey(username)){
-//                            Account updatedAccount = new Account(username, password,  Integer.parseInt(((HashMap<String, Object>) hm.get(username)).get("score").toString()));
-//                            mDatabase.child("Accounts").child(username).setValue(updatedAccount);
-//                            updatedPassword = true;
-//                        }
-//                    }
-//                }
-//                for (DataSnapshot ds : snapshot.getChildren()) {
-//                    if (ds.child("username").getValue().equals(username)) {
-//                        userNameTextView.setText(username);
-//                        scoreTextView.setText((Integer) ds.child("score").getValue());
-//                    }
-//                }
+                LoginActivity.retrieveLeaderboardData(snapshot);
             }
 
             @Override
@@ -140,5 +90,15 @@ public class ProfileFragment extends Fragment {
 
             }
         });
+    }
+    private void intializeLeaderboard(boolean friendsOnly){
+        ArrayList<String> usernames = new ArrayList<>(LoginActivity.getLeaderboard().keySet());
+        ArrayList<Integer> scores = new ArrayList<>(LoginActivity.getLeaderboard().values());
+        if(friendsOnly){
+            //reset usernames and scores
+        }
+        LeaderboardRecyclerViewAdapter adapter = new LeaderboardRecyclerViewAdapter(mContext,usernames, scores);
+        leaderboardRecyclerView.setAdapter(adapter);
+        leaderboardRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
     }
 }
