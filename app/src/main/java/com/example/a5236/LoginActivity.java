@@ -187,7 +187,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        System.out.println(id);
         showAddItemDialog(id);
 
 //        if (id == R.id.option_add_friend) {
@@ -305,7 +304,7 @@ public class LoginActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .create();
         dialog.show();
-        System.out.println(response);
+//        System.out.println(response);
 
     }
 
@@ -324,9 +323,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void addFriend (String friend, DataSnapshot snapshot){
-        if (snapshot.child("Accounts").child("friend").getValue() != null) {
+        if (snapshot.child("Accounts").child(friend).getValue() != null) {
             ArrayList<String> friendsList = (ArrayList<String>) snapshot.child("Friends")
                     .child(LoggedInUser.getUserId()).getValue();
+            System.out.println(friendsList.toString());
             friendsList.add(friend);
             mDatabase.child("Friends").child(LoggedInUser.getUserId()).setValue(friendsList);
         }

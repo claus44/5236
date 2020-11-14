@@ -272,8 +272,12 @@ public class SignUpFragment extends Fragment {
         if (!userExists) {
             Account account = new Account(username, password, 0);
             mDatabase.child("Accounts").child(account.getUsername()).setValue(account);
+            //create entry with username set as value
             mDatabase.child("Friends").child(account.getUsername()).setValue(username);
-            mDatabase.child("Friends").child(account.getUsername()).setValue(new ArrayList<String>());
+            //change value to arraylist. automatically includes their own name
+            ArrayList<String> friends = new ArrayList<String>();
+            friends.add(username);
+            mDatabase.child("Friends").child(account.getUsername()).setValue(friends);
         }
         return userExists;
     }
