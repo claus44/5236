@@ -118,6 +118,7 @@ public class LandmarkFragment extends Fragment {
         hintButton = getView().findViewById(R.id.landmark_hint);
         final ImageView landmarkImg = getView().findViewById(R.id.landmark_img);
         final TextView landmarkTitle = getView().findViewById(R.id.landmark_title);
+        final TextView landmarkDifficulty = getView().findViewById(R.id.landmark_difficulty);
         final TextView landmarkDescription = getView().findViewById(R.id.landmark_description);
         final TextView landmarkHint = getView().findViewById(R.id.landmark_hint_text);
         //disable found and hint button if user already found landmark
@@ -129,6 +130,7 @@ public class LandmarkFragment extends Fragment {
 
 
         landmarkTitle.setText(landmark.getTitle());
+        landmarkDifficulty.setText("Difficulty: " + Integer.toString(landmark.getDifficulty()));
         landmarkDescription.setText(landmark.getDescription());
         mStorageRef = FirebaseStorage.getInstance().getReference().child(landmark.getImage());
         GlideApp.with(mContext).load(mStorageRef).into(landmarkImg);
@@ -159,7 +161,7 @@ public class LandmarkFragment extends Fragment {
 
                         landmarkHint.setText(landmark.getHint());
                         hintButton.setEnabled(false);
-
+                        Toast.makeText((LoginActivity) getActivity(),"You took a hint: Score - 1!",Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
