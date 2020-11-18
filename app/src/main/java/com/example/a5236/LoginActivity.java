@@ -250,66 +250,53 @@ public class LoginActivity extends AppCompatActivity {
             title = "Logout";
             message = "Sure you want to logout?";
         }
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setView(taskEditText)
-                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        response = String.valueOf(taskEditText.getText());
+        if(id != R.id.option_logout_account){
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setView(taskEditText)
+                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            response = String.valueOf(taskEditText.getText());
 
-                        if (id == R.id.option_add_friend) {
-                            if (!response.equals(LoggedInUser.getUserId())) {
-                                mDatabase = FirebaseDatabase.getInstance().getReference();
-                                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        addFriend(response, snapshot);
-                                    }
+                            if (id == R.id.option_add_friend) {
+                                if (!response.equals(LoggedInUser.getUserId())) {
+                                    mDatabase = FirebaseDatabase.getInstance().getReference();
+                                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            addFriend(response, snapshot);
+                                        }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                    }
-                                });
-                            }
-
-                        } else if (id == R.id.option_remove_friend) {
-                            if (!response.equals(LoggedInUser.getUserId())) {
-                                mDatabase = FirebaseDatabase.getInstance().getReference();
-                                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        removeFriend(response, snapshot);
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                    }
-                                });
-                            }
-
-                        } else if (id == R.id.option_update_password) {
-
-                            mDatabase = FirebaseDatabase.getInstance().getReference();
-                            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    updatePassword(snapshot, response);
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                        }
+                                    });
                                 }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-                                }
-                            });
+                            } else if (id == R.id.option_remove_friend) {
+                                if (!response.equals(LoggedInUser.getUserId())) {
+                                    mDatabase = FirebaseDatabase.getInstance().getReference();
+                                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            removeFriend(response, snapshot);
+                                        }
 
-                        } else if (id == R.id.option_delete_account) {
-                            if (response.equals(LoggedInUser.getUserId())) {
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                        }
+                                    });
+                                }
+
+                            } else if (id == R.id.option_update_password) {
+
                                 mDatabase = FirebaseDatabase.getInstance().getReference();
                                 mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        deleteUser(snapshot, response);
+                                        updatePassword(snapshot, response);
                                     }
 
                                     @Override
@@ -317,23 +304,43 @@ public class LoginActivity extends AppCompatActivity {
                                     }
                                 });
 
+                            } else if (id == R.id.option_delete_account) {
+                                if (response.equals(LoggedInUser.getUserId())) {
+                                    mDatabase = FirebaseDatabase.getInstance().getReference();
+                                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            deleteUser(snapshot, response);
+                                        }
 
-                            }
-                        }else if (id == R.id.option_logout_account) {
-                            if (response.equals(LoggedInUser.getUserId())) {
-                                setLoggedInUser(null);
-                                Intent intent = getIntent();
-                                finish();
-                                startActivity(intent);
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                        }
+                                    });
+                                }
                             }
                         }
-
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .create();
+            dialog.show();
+        }else{
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        setLoggedInUser(null);
+                        Intent intent = getIntent();
+                        finish();
+                        startActivity(intent);
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("No", null)
                 .create();
-        dialog.show();
-
+            dialog.show();
+        }
     }
 
     private void deleteUser(DataSnapshot dataSnapshot, String username){
