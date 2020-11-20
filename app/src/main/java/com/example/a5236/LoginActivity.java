@@ -230,6 +230,7 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // options menu buttons logic
     private void showAddItemDialog(final int id) {
         final EditText taskEditText = new EditText(this);
         String title = "";

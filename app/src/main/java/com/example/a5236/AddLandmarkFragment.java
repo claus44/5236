@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.fragment.app.Fragment;
@@ -25,7 +24,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +59,7 @@ import java.util.List;
 public class AddLandmarkFragment extends Fragment {
     private static final String TAG = "AddLandmarkFragment";
     private static final int Image_Capture_Code = 1;
+    private static final int PICTURE_QUALITY = 50; // quality of jpeg compression
     private StorageReference mStorageRef;
     private DatabaseReference mDatabase;
     ImageView mImageView;
@@ -322,7 +321,7 @@ public class AddLandmarkFragment extends Fragment {
 
     public byte[] covertBitmapToStoreInFirebase(Bitmap bitmap){
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, PICTURE_QUALITY, baos);
         byte[] data = baos.toByteArray();
         return data;
     }
