@@ -2,9 +2,12 @@ package com.example.a5236;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import com.example.a5236.data.model.LoggedInUser;
@@ -54,13 +57,9 @@ public class LoginActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
 
 
-    public static Account getUser() {
-        return user;
-    }
+    public static Account getUser() { return user; }
 
-    public static void setUser(Account user) {
-        LoginActivity.user = user;
-    }
+    public static void setUser(Account user) { LoginActivity.user = user; }
 
     public static ArrayList<String> getFriends() {
         return friends;
@@ -125,7 +124,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         Log.d(TAG, "onResume()");
-
     }
 
     @Override
@@ -263,61 +261,73 @@ public class LoginActivity extends AppCompatActivity {
 
                             if (id == R.id.option_add_friend) {
                                 if (!response.equals(LoggedInUser.getUserId())) {
-                                    mDatabase = FirebaseDatabase.getInstance().getReference();
-                                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            addFriend(response, snapshot);
-                                        }
+                                    if(isConnectedToInternet()){
+                                        mDatabase = FirebaseDatabase.getInstance().getReference();
+                                        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                addFriend(response, snapshot);
+                                            }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-                                        }
-                                    });
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                            }
+                                        });
+                                    }else{
+                                        noInternetConnectionNotif();
+                                    }
                                 }
-
                             } else if (id == R.id.option_remove_friend) {
                                 if (!response.equals(LoggedInUser.getUserId())) {
+                                    if(isConnectedToInternet()){
+                                        mDatabase = FirebaseDatabase.getInstance().getReference();
+                                        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                removeFriend(response, snapshot);
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                            }
+                                        });
+                                    }else{
+                                        noInternetConnectionNotif();
+                                    }
+                                }
+                            } else if (id == R.id.option_update_password) {
+                                if(isConnectedToInternet()){
                                     mDatabase = FirebaseDatabase.getInstance().getReference();
                                     mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            removeFriend(response, snapshot);
+                                            updatePassword(snapshot, response);
                                         }
 
                                         @Override
                                         public void onCancelled(@NonNull DatabaseError error) {
                                         }
                                     });
+                                }else{
+                                    noInternetConnectionNotif();
                                 }
-
-                            } else if (id == R.id.option_update_password) {
-
-                                mDatabase = FirebaseDatabase.getInstance().getReference();
-                                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        updatePassword(snapshot, response);
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                    }
-                                });
-
                             } else if (id == R.id.option_delete_account) {
                                 if (response.equals(LoggedInUser.getUserId())) {
-                                    mDatabase = FirebaseDatabase.getInstance().getReference();
-                                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            deleteUser(snapshot, response);
-                                        }
+                                    if(isConnectedToInternet()){
+                                        mDatabase = FirebaseDatabase.getInstance().getReference();
+                                        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                deleteUser(snapshot, response);
+                                            }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-                                        }
-                                    });
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                            }
+                                        });
+                                    }else{
+                                        noInternetConnectionNotif();
+                                    }
                                 }
                             }
                         }
@@ -445,5 +455,32 @@ public class LoginActivity extends AppCompatActivity {
         }
         return sorted;
     }
+    public boolean isConnectedToInternet(){
+        boolean isConnected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            isConnected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return isConnected;
+        } catch (Exception e) {
+            Toast.makeText(this,  "Network Connectivity Issues", Toast.LENGTH_SHORT).show();
+        }
+        return isConnected = false;
+    }
+    public void noInternetConnectionNotif(){
+        Toast.makeText(this,  "No Network", Toast.LENGTH_SHORT).show();
+    }
 
+    public static boolean isConnectedToInternet(Context mContext){
+        boolean isConnected = false;
+        try {
+            ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo nInfo = cm.getActiveNetworkInfo();
+            isConnected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
+            return isConnected;
+        } catch (Exception e) {
+            Toast.makeText(mContext,  "Network Connectivity Issues", Toast.LENGTH_SHORT).show();
+        }
+        return isConnected = false;
+    }
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -95,8 +96,13 @@ public class LandmarkListAdapter extends BaseExpandableListAdapter {
         }
 
         ImageView ivLandmarkItemImage = (ImageView) convertView.findViewById(R.id.landmarkItemImage);
-        mStorageRef = FirebaseStorage.getInstance().getReference().child(landmarkItem.getImage());
-        GlideApp.with(mContext).load(mStorageRef).into(ivLandmarkItemImage);
+         if(LoginActivity.isConnectedToInternet(mContext)){
+            mStorageRef = FirebaseStorage.getInstance().getReference().child(landmarkItem.getImage());
+            GlideApp.with(mContext).load(mStorageRef).into(ivLandmarkItemImage);
+        }else{
+            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+        }
+
 
         return convertView;
     }

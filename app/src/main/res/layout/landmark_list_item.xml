@@ -11,7 +11,8 @@
         <ImageView
             android:id="@+id/landmarkItemImage"
             android:layout_width="match_parent"
-            android:layout_height="60dp"/>
+            android:layout_height="60dp"
+            android:src="@android:drawable/ic_menu_gallery"/>
 
     </LinearLayout>
 

@@ -8,6 +8,7 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -44,6 +45,7 @@ public class LoginFragment extends Fragment {
     private EditText usernameEditText, passwordEditText;
     private Button loginButton, registerButton;
     private ProgressBar loadingProgressBar;
+    private Context mContext;
 
     @Nullable
     @Override
@@ -58,7 +60,7 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
-
+        mContext = (LoginActivity) getActivity();
         usernameEditText = view.findViewById(R.id.username);
         passwordEditText = view.findViewById(R.id.password);
         loginButton = view.findViewById(R.id.signup);
@@ -175,30 +177,36 @@ public class LoginFragment extends Fragment {
         return loginCorrect;
     }
     private void login(){
-        loadingProgressBar.setVisibility(View.VISIBLE);
-        final String username = usernameEditText.getText().toString();
-        final String password = passwordEditText.getText().toString();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        user = new LoggedInUser(username);
-        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                boolean loginCorrect = checkUsernameAndPassword(snapshot, username, password);
-                if(loginCorrect){
-                    loginViewModel.login(loginCorrect, user);
-                    LoginActivity.setLoggedInUser(user);
-                    LoginActivity.retrieveLandmarkData(snapshot);
-                    LoginActivity.retrieveLeaderboardData(snapshot);
-                    LoginActivity.retrieveFriendData(snapshot, username);
-                    NavHostFragment.findNavController(LoginFragment.this)
-                            .navigate(R.id.action_loginFragment_to_landmarkActivity);
-                }else{
-                    loginViewModel.login(loginCorrect, user);
-                    loadingProgressBar.setVisibility(View.GONE);
+        if(LoginActivity.isConnectedToInternet(mContext)){
+            loadingProgressBar.setVisibility(View.VISIBLE);
+            final String username = usernameEditText.getText().toString();
+            final String password = passwordEditText.getText().toString();
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            user = new LoggedInUser(username);
+            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    boolean loginCorrect = checkUsernameAndPassword(snapshot, username, password);
+                    if(loginCorrect){
+                        loginViewModel.login(loginCorrect, user);
+                        LoginActivity.setLoggedInUser(user);
+                        LoginActivity.retrieveLandmarkData(snapshot);
+                        LoginActivity.retrieveLeaderboardData(snapshot);
+                        LoginActivity.retrieveFriendData(snapshot, username);
+                        NavHostFragment.findNavController(LoginFragment.this)
+                                .navigate(R.id.action_loginFragment_to_landmarkActivity);
+                    }else{
+                        loginViewModel.login(loginCorrect, user);
+                        loadingProgressBar.setVisibility(View.GONE);
+                    }
                 }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) { }
+            });
+        }else{
+            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+        }
+
     }
+
 }

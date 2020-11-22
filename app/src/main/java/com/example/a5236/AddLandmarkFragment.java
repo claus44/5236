@@ -179,26 +179,40 @@ public class AddLandmarkFragment extends Fragment {
     @SuppressLint("MissingPermission")
     // only called if permission is granted
     private void createLandmarkWithLocation(){
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                Location location = task.getResult();
-                if(location != null){
-                    Double latitude = location.getLatitude();
-                    Double longtitude = location.getLongitude();
-                    coordinates = longtitude + "," + latitude;
-                    mDatabase = FirebaseDatabase.getInstance().getReference();
-                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            tryCreateLandmark(snapshot, title, difficulty, desc, hint);
+        fusedLocationProviderClient.getLastLocation()
+            .addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    Location location = task.getResult();
+                    if(location != null){
+                        Double latitude = location.getLatitude();
+                        Double longtitude = location.getLongitude();
+                        coordinates = longtitude + "," + latitude;
+                        if(LoginActivity.isConnectedToInternet(mContext)){
+                            mDatabase = FirebaseDatabase.getInstance().getReference();
+                            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    tryCreateLandmark(snapshot, title, difficulty, desc, hint);
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) { }
+                            });
+                        }else{
+                            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
                         }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) { }
-                    });
+                    }
+                    else{
+                        Toast.makeText(getActivity(), "Failed to get GPS location", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getActivity(), "Failed to get GPS location", Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 
     private final TextWatcher txtWatcher = new TextWatcher() {

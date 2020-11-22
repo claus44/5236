@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.a5236.data.model.LoggedInUser;
 import com.google.firebase.database.DataSnapshot;
@@ -71,23 +72,33 @@ public class ProfileFragment extends Fragment {
         friendFilter.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                intializeLeaderboard(isChecked);
+                if(LoginActivity.isConnectedToInternet(mContext)){
+                    intializeLeaderboard(isChecked);
+                }else{
+                    Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         userNameTextView.setText(username);
         scoreTextView.setText("score: " + LoginActivity.getUser().getScore());
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                LoginActivity.retrieveLeaderboardData(snapshot);
-            }
+        if(LoginActivity.isConnectedToInternet(mContext)){
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    LoginActivity.retrieveLeaderboardData(snapshot);
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
+        }else{
+            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+        }
+
     }
     private void intializeLeaderboard(boolean friendsOnly){
         ArrayList<String> usernames = new ArrayList<>(LoginActivity.getLeaderboard().keySet());
