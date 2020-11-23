@@ -261,7 +261,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             if (id == R.id.option_add_friend) {
                                 if (!response.equals(LoggedInUser.getUserId())) {
-                                    if(isConnectedToInternet()){
+                                    if(isConnectedToInternet(getApplicationContext())){
                                         mDatabase = FirebaseDatabase.getInstance().getReference();
                                         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -279,7 +279,7 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             } else if (id == R.id.option_remove_friend) {
                                 if (!response.equals(LoggedInUser.getUserId())) {
-                                    if(isConnectedToInternet()){
+                                    if(isConnectedToInternet(getApplicationContext())){
                                         mDatabase = FirebaseDatabase.getInstance().getReference();
                                         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -296,7 +296,7 @@ public class LoginActivity extends AppCompatActivity {
                                     }
                                 }
                             } else if (id == R.id.option_update_password) {
-                                if(isConnectedToInternet()){
+                                if(isConnectedToInternet(getApplicationContext())){
                                     mDatabase = FirebaseDatabase.getInstance().getReference();
                                     mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
@@ -313,7 +313,7 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             } else if (id == R.id.option_delete_account) {
                                 if (response.equals(LoggedInUser.getUserId())) {
-                                    if(isConnectedToInternet()){
+                                    if(isConnectedToInternet(getApplicationContext())){
                                         mDatabase = FirebaseDatabase.getInstance().getReference();
                                         mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -455,20 +455,9 @@ public class LoginActivity extends AppCompatActivity {
         }
         return sorted;
     }
-    public boolean isConnectedToInternet(){
-        boolean isConnected = false;
-        try {
-            ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo nInfo = cm.getActiveNetworkInfo();
-            isConnected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
-            return isConnected;
-        } catch (Exception e) {
-            Toast.makeText(this,  "Network Connectivity Issues", Toast.LENGTH_SHORT).show();
-        }
-        return isConnected = false;
-    }
+
     public void noInternetConnectionNotif(){
-        Toast.makeText(this,  "No Network", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,  "No Internet", Toast.LENGTH_SHORT).show();
     }
 
     public static boolean isConnectedToInternet(Context mContext){
