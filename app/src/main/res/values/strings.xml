@@ -34,6 +34,8 @@
     <string name="landmark_description">Description</string>
     <string name="landmark_found_btn">Found it!</string>
     <string name="landmark_hint_btn">Hint?</string>
+    <string name="landmark_hint_header">Hint:</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
@@ -55,4 +57,10 @@
     <string name="friend_switch">Friends Only</string>
     <color name="gray">#d4d0cf</color>
     <color name="white">#FFFFFF</color>
+
+    <string name="menu_add_friend">Add Friend</string>
+    <string name="menu_remove_friend">Remove Friend</string>
+    <string name="menu_update_password">Update Password</string>
+    <string name="menu_delete_account">Delete Account</string>
+    <string name="menu_logout">Logout</string>
 </resources>

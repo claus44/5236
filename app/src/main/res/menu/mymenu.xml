@@ -2,22 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/option_add_friend"
-        android:title="Add Friend"
+        android:title="@string/menu_add_friend"
         android:visible="true" />
     <item
         android:id="@+id/option_remove_friend"
-        android:title="Remove Friend"
+        android:title="@string/menu_remove_friend"
         android:visible="true" />
     <item
         android:id="@+id/option_update_password"
         android:title="@string/update_password" />
     <item
         android:id="@+id/option_delete_account"
-        android:title="Delete Account"
+        android:title="@string/menu_delete_account"
         android:visible="true" />
 
     <item
         android:id="@+id/option_logout_account"
-        android:title="Logout"
+        android:title="@string/menu_logout"
         android:visible="true" />
 </menu>
