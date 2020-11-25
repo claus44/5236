@@ -75,13 +75,13 @@ public class ProfileFragment extends Fragment {
                 if(LoginActivity.isConnectedToInternet(mContext)){
                     intializeLeaderboard(isChecked);
                 }else{
-                    Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext,  getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
         userNameTextView.setText(username);
-        scoreTextView.setText("score: " + LoginActivity.getUser().getScore());
+        scoreTextView.setText(getString(R.string.profile_score) + LoginActivity.getUser().getScore());
         if(LoginActivity.isConnectedToInternet(mContext)){
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
             ref.addValueEventListener(new ValueEventListener() {
@@ -96,10 +96,11 @@ public class ProfileFragment extends Fragment {
                 }
             });
         }else{
-            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,  getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
         }
 
     }
+
     private void intializeLeaderboard(boolean friendsOnly){
         ArrayList<String> usernames = new ArrayList<>(LoginActivity.getLeaderboard().keySet());
         ArrayList<Integer> scores = new ArrayList<>(LoginActivity.getLeaderboard().values());
@@ -115,7 +116,6 @@ public class ProfileFragment extends Fragment {
             }
             usernames = usernamesTemp;
             scores = scoresTemp;
-
         }
         LeaderboardRecyclerViewAdapter adapter = new LeaderboardRecyclerViewAdapter(mContext,usernames, scores);
         leaderboardRecyclerView.setAdapter(adapter);

@@ -176,9 +176,7 @@ public class SignUpFragment extends Fragment {
         if (!userExists) {
             Account account = new Account(username, password, 0);
             mDatabase.child("Accounts").child(account.getUsername()).setValue(account);
-            //create entry with username set as value
             mDatabase.child("Friends").child(account.getUsername()).setValue(username);
-            //change value to arraylist. automatically includes their own name
             ArrayList<String> friends = new ArrayList<String>();
             friends.add(username);
             mDatabase.child("Friends").child(account.getUsername()).setValue(friends);
@@ -204,7 +202,7 @@ public class SignUpFragment extends Fragment {
                         if(!userExists){
                             signUpViewModel.register(true, user, true);
                             LoginActivity.setLoggedInUser(user);
-                            LoginActivity.retrieveLandmarkData(snapshot);
+                            LoginActivity.retrieveLandmarkData(snapshot,mContext);
                             LoginActivity.retrieveLeaderboardData(snapshot);
                             NavHostFragment.findNavController(SignUpFragment.this)
                                     .navigate(R.id.action_signUpFragment_to_landmarkActivity);
@@ -220,7 +218,7 @@ public class SignUpFragment extends Fragment {
                 signUpViewModel.register(false, user, false);
             }
         }else{
-            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,  getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
         }
     }
 }

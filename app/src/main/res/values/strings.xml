@@ -1,19 +1,13 @@
 <resources>
-    <string name="app_name">5236</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="app_name">Columbus Sights</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
-    <string name="previous">Previous</string>
     <string name="profile">Profile</string>
     <string name="back">Back</string>
     <string name="camera">Camera</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <!-- Strings related to login -->
-    <string name="prompt_email">Username</string>
+    <!-- Strings related to login and sign up-->
+    <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
     <string name="prompt_password_confirmation">Confirm Password</string>
     <string name="action_sign_in">Sign in</string>
@@ -27,18 +21,24 @@
     <string name="login_failed">Login failed</string>
     <string name="registration_failed">Username already exists</string>
     <string name="password_confirmation_failed">Passwords do not match</string>
-    <string name="delete_user">Delete User</string>
-    <string name="update_password">Update Password</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
+    <!-- Strings related to landmark list -->
+    <string name="load_more">Load More</string>
+    <string name="found_group">Found</string>
+    <string name="not_found_group">Not Found</string>
+
+    <!-- Strings related to landmark view -->
     <string name="landmark_title">Title</string>
     <string name="landmark_description">Description</string>
+    <string name="landmark_difficulty">Difficulty:</string>
     <string name="landmark_found_btn">Found it!</string>
     <string name="landmark_hint_btn">Hint?</string>
     <string name="landmark_hint_header">Hint:</string>
+    <string name="hint_pt_deduction">You took a hint: Score - 1!</string>
+    <string name="found_pt_add">Location Found! Score:</string>
+    <string name="wrong_location">Wrong Location!</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <!-- Strings related to landmark creation -->
     <string name="prompt_title">Add a title</string>
     <string name="prompt_description">Add a description</string>
     <string name="prompt_hint">Add a hint</string>
@@ -46,21 +46,65 @@
     <string name="hint_difficulty">1</string>
     <string name="action_create_landmark">Create Landmark</string>
     <string name="action_rotate_image">Rotate</string>
-    <string name="divider_text">------------OR------------</string>
     <string name="action_retry">Retry</string>
     <string name="title_error">Title required</string>
     <string name="desc_error">Description required</string>
     <string name="hint_error">Hint required</string>
     <string name="diff_error">Difficulty between 1 and 10 required</string>
+    <string name="title_contains_error">Title can only contain letters and digits</string>
+    <string name="failed_landmark_creation">Failed to create landmark</string>
+    <string name="successful_landmark_creation">Landmark successfully created</string>
+    <string name="title_exists">Landmark title already exists</string>
 
-    <string name="leaderboard">Leaderboard</string>
-    <string name="friend_switch">Friends Only</string>
+    <!-- Strings related to profile -->
+    <string name="profile_username">Username</string>
+    <string name="profile_score">Score</string>
+    <string name="profile_leaderboard">Leaderboard</string>
+    <string name="profile_friend_switch">Friends Only</string>
+
+    <!-- Strings related to menu -->
+    <!-- Strings for Add Friend -->
+    <string name="menu_add_friend">Add Friend</string>
+    <string name="added">Added</string>
+    <string name="added_friend">as a friend</string>
+    <string name="already_friend">is already a friend</string>
+    <!-- Strings for Remove Friend -->
+    <string name="menu_remove_friend">Remove Friend</string>
+    <string name="removed">Removed</string>
+    <string name="from_friends">from friends</string>
+    <string name="not_a_friend">is not a friend</string>
+    <string name="menu_friend_msg">Enter desired username</string>
+    <string name="does_not_exist">does not exist</string>
+    <!-- Strings for updating password -->
+    <string name="menu_update_password">Update Password</string>
+    <string name="menu_update_pass_msg">Enter your new password</string>
+    <string name="update_pass_success">Successfully updated password</string>
+    <string name="update_pass_failure">Failed to update password</string>
+    <!-- Strings for deleting account -->
+    <string name="menu_delete_account">Delete Account</string>
+    <string name="menu_delete_account_msg">Are you sure? Enter your username to confirm.</string>
+    <string name="account_deletion_success">Successfully deleted account</string>
+    <string name="account_deletion_failure">Failed to delete account</string>
+    <!-- Strings for logout -->
+    <string name="menu_logout">Logout</string>
+    <string name="menu_logout_msg">Sure you want to logout?</string>
+    <!-- Strings for dialog options -->
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!-- Strings related to access & failures -->
+    <string name="no_internet">No Internet</string>
+    <string name="network_connect_failure">Network Connectivity Issues</string>
+    <string name="location_access">Need Location Access</string>
+    <string name="failed_location">Failed to get GPS location</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="camera_access">Need Camera Access</string>
+    <string name="storage_access">Need Storage Access</string>
+
+    <!-- Colors -->
     <color name="gray">#d4d0cf</color>
     <color name="white">#FFFFFF</color>
 
-    <string name="menu_add_friend">Add Friend</string>
-    <string name="menu_remove_friend">Remove Friend</string>
-    <string name="menu_update_password">Update Password</string>
-    <string name="menu_delete_account">Delete Account</string>
-    <string name="menu_logout">Logout</string>
 </resources>

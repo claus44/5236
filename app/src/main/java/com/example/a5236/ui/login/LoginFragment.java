@@ -190,7 +190,7 @@ public class LoginFragment extends Fragment {
                     if(loginCorrect){
                         loginViewModel.login(loginCorrect, user);
                         LoginActivity.setLoggedInUser(user);
-                        LoginActivity.retrieveLandmarkData(snapshot);
+                        LoginActivity.retrieveLandmarkData(snapshot, mContext);
                         LoginActivity.retrieveLeaderboardData(snapshot);
                         LoginActivity.retrieveFriendData(snapshot, username);
                         NavHostFragment.findNavController(LoginFragment.this)
@@ -204,7 +204,7 @@ public class LoginFragment extends Fragment {
                 public void onCancelled(@NonNull DatabaseError error) { }
             });
         }else{
-            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,  getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
         }
 
     }

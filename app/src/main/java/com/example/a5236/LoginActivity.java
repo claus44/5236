@@ -56,22 +56,19 @@ public class LoginActivity extends AppCompatActivity {
     public static Menu myMenu;
     private DatabaseReference mDatabase;
 
-
     public static Account getUser() { return user; }
-
     public static void setUser(Account user) { LoginActivity.user = user; }
 
     public static ArrayList<String> getFriends() {
         return friends;
     }
-
     public static void setFriends(ArrayList<String> friends) {
         LoginActivity.friends = friends;
     }
+
     public static HashMap<String, Integer> getLeaderboard() {
         return sortByScore(leaderboard);
     }
-
     public static void setLeaderboard(HashMap<String, Integer> leaderboard) {
         LoginActivity.leaderboard = sortByScore(leaderboard);
     }
@@ -79,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
     public static File getPhoto() {
         return photo;
     }
-
     public static void setPhoto(File photo) {
         LoginActivity.photo = photo;
     }
@@ -109,15 +105,6 @@ public class LoginActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setPhoto(getPhotoFile("landmark"));
-
-//        FloatingActionButton fab = findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
     }
 
     @Override
@@ -150,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    public static void retrieveLandmarkData(DataSnapshot dataSnapshot){
+    public static void retrieveLandmarkData(DataSnapshot dataSnapshot, Context mContext){
         HashMap<String, List<Landmark>> landmarkList = new HashMap<String, List<Landmark>>();
 
         List<Landmark> notFound = new ArrayList<Landmark>();
@@ -173,8 +160,8 @@ public class LoginActivity extends AppCompatActivity {
                 notFound.add(landmark);
             }
         }
-        landmarkList.put("Not Found", notFound);
-        landmarkList.put("Found", found);
+        landmarkList.put(mContext.getResources().getString(R.string.not_found_group), notFound);
+        landmarkList.put(mContext.getResources().getString(R.string.found_group), found);
         setLandmarkItemList(landmarkList);
     }
 
@@ -234,27 +221,27 @@ public class LoginActivity extends AppCompatActivity {
         String title = "";
         String message = "";
         if (id == R.id.option_add_friend) {
-            title = "Add Friend";
-            message = "Enter desired Username";
+            title = getString(R.string.menu_add_friend);
+            message = getString(R.string.menu_friend_msg);
         } else if (id == R.id.option_remove_friend) {
-            title = "Remove Friend";
-            message = "Enter desired Username";
+            title = getString(R.string.menu_remove_friend);
+            message = getString(R.string.menu_friend_msg);
         } else if (id == R.id.option_delete_account) {
-            title = "Delete Account";
-            message = "Are you sure? Enter your username to confirm";
+            title = getString(R.string.menu_delete_account);
+            message = getString(R.string.menu_delete_account_msg);
         } else if (id == R.id.option_update_password) {
-            title = "Update Password";
-            message = "Enter your new password";
+            title = getString(R.string.menu_update_password);
+            message = getString(R.string.menu_update_pass_msg);
         }else if(id == R.id.option_logout_account){
-            title = "Logout";
-            message = "Sure you want to logout?";
+            title = getString(R.string.menu_logout);
+            message = getString(R.string.menu_logout_msg);
         }
         if(id != R.id.option_logout_account){
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle(title)
                     .setMessage(message)
                     .setView(taskEditText)
-                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             response = String.valueOf(taskEditText.getText());
@@ -332,14 +319,14 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         }
                     })
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton(getString(R.string.cancel), null)
                     .create();
             dialog.show();
         }else{
             AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         setLoggedInUser(null);
@@ -348,7 +335,7 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton(getString(R.string.no), null)
                 .create();
             dialog.show();
         }
@@ -383,7 +370,7 @@ public class LoginActivity extends AppCompatActivity {
                         mDatabase.child("Friends").child(username).removeValue();
                     }
                     userDeleted = true;
-                    Toast.makeText(this, "Successfully Deleted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.account_deletion_success), Toast.LENGTH_SHORT).show();
                     Intent intent = getIntent();
                     finish();
                     startActivity(intent);
@@ -391,7 +378,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         if(!userDeleted){
-            Toast.makeText(this, "Failed to Delete", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.account_deletion_failure), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -403,13 +390,13 @@ public class LoginActivity extends AppCompatActivity {
             if(!friendsList.contains(friend)){
                 friendsList.add(friend);
                 friends.add(friend);
-                Toast.makeText(this, "Added "+ friend+ " as a friend", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.added) + " " + friend + " " + getString(R.string.added_friend), Toast.LENGTH_SHORT).show();
             }else{
-                Toast.makeText(this,  friend+ " is already a friend", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,  friend + " " + getString(R.string.already_friend), Toast.LENGTH_SHORT).show();
             }
             mDatabase.child("Friends").child(LoggedInUser.getUserId()).setValue(friendsList);
         }else{
-            Toast.makeText(this,  friend+ " does not exist", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,  friend+ " " + getString(R.string.does_not_exist), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -421,13 +408,13 @@ public class LoginActivity extends AppCompatActivity {
             if(friendsList.contains(friend)){
                 friendsList.remove(friend);
                 friends.remove(friend);
-                Toast.makeText(this, "Removed "+ friend+ " from friends", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.removed) + " " + friend + " "+ getString(R.string.from_friends), Toast.LENGTH_SHORT).show();
             }else{
-                Toast.makeText(this, friend+ " is not a friend", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, friend+ " " + getString(R.string.not_a_friend), Toast.LENGTH_SHORT).show();
             }
             mDatabase.child("Friends").child(LoggedInUser.getUserId()).setValue(friendsList);
         }else{
-            Toast.makeText(this,  friend+ " does not exist", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,  friend+ " " + getString(R.string.does_not_exist), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -435,9 +422,9 @@ public class LoginActivity extends AppCompatActivity {
     private void updatePassword(DataSnapshot dataSnapshot, String password) {
         if(mDatabase.child("Accounts").child(LoggedInUser.getUserId()) != null){
             mDatabase.child("Accounts").child(LoggedInUser.getUserId()).child("password").setValue(password);
-            Toast.makeText(this,  "Successfully updated password ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,  getString(R.string.update_pass_success), Toast.LENGTH_SHORT).show();
         }else{
-            Toast.makeText(this,  "Failed to update password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,  getString(R.string.update_pass_failure), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -457,7 +444,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void noInternetConnectionNotif(){
-        Toast.makeText(this,  "No Internet", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,  getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
     }
 
     public static boolean isConnectedToInternet(Context mContext){
@@ -468,7 +455,7 @@ public class LoginActivity extends AppCompatActivity {
             isConnected = nInfo != null && nInfo.isAvailable() && nInfo.isConnected();
             return isConnected;
         } catch (Exception e) {
-            Toast.makeText(mContext,  "Network Connectivity Issues", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,  mContext.getResources().getString(R.string.network_connect_failure), Toast.LENGTH_SHORT).show();
         }
         return isConnected = false;
     }

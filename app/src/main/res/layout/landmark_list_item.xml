@@ -33,14 +33,12 @@
             <TextView
                 android:id="@+id/landmarkListItemTitle"
                 android:layout_width="match_parent"
-
                 android:layout_height="30dp"
                 android:gravity="center" />
 
             <TextView
                 android:id="@+id/landmarkListItemDescription"
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
                 android:gravity="center" />
 
@@ -52,7 +50,6 @@
         android:id="@+id/load_more_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Load More" />
-
+        android:text="@string/load_more" />
 
 </LinearLayout>

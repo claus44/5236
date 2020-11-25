@@ -136,7 +136,7 @@ public class LandmarkListAdapter extends BaseExpandableListAdapter {
                 mStorageRef = FirebaseStorage.getInstance().getReference().child(landmarkItem.getImage());
                 GlideApp.with(mContext).load(mStorageRef).into(ivLandmarkItemImage);
             }else{
-                Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,  mContext.getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
             }
             Button loadMoreBtn = (Button) convertView.findViewById(R.id.load_more_button);
             loadMoreBtn.setVisibility(View.GONE);

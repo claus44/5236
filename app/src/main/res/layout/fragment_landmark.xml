@@ -7,8 +7,6 @@
     android:orientation="vertical"
     tools:context=".LandmarkFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <ImageView
         android:id="@+id/landmark_img"
         android:layout_width="match_parent"

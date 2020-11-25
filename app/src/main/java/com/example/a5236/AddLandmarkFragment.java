@@ -170,7 +170,7 @@ public class AddLandmarkFragment extends Fragment {
                     createLandmarkWithLocation();
                 }else {
                     loadingProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(getActivity(), "Need Location Access", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.location_access), Toast.LENGTH_SHORT).show();
                 }
                 return;
         }
@@ -199,18 +199,18 @@ public class AddLandmarkFragment extends Fragment {
                                 public void onCancelled(@NonNull DatabaseError error) { }
                             });
                         }else{
-                            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext,  getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
                         }
                     }
                     else{
-                        Toast.makeText(getActivity(), "Failed to get GPS location", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getString(R.string.failed_location), Toast.LENGTH_SHORT).show();
                     }
                 }
             })
             .addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getActivity(), "Failed to get GPS location", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.failed_location), Toast.LENGTH_SHORT).show();
                 }
             });
     }
@@ -227,7 +227,7 @@ public class AddLandmarkFragment extends Fragment {
             int checksPassed = 0;
             if(titleEditText.getText().toString().length()!=0 ){
                 if(!titleEditText.getText().toString().matches("[\\dA-Za-z ]+")){
-                    Toast.makeText(getContext().getApplicationContext(), "Title can only contain letters and digits", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext().getApplicationContext(), getString(R.string.title_contains_error), Toast.LENGTH_SHORT).show();
                     titleEditText.setError(mContext.getResources().getString(R.string.title_error));
                 }else {
                     checksPassed++;
@@ -272,7 +272,7 @@ public class AddLandmarkFragment extends Fragment {
                     e.printStackTrace();
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getString(R.string.cancelled), Toast.LENGTH_SHORT).show();
                 NavHostFragment.findNavController(AddLandmarkFragment.this)
                         .navigate(R.id.action_addLandmarkFragment_to_landmarksListFragment);
             }
@@ -290,7 +290,7 @@ public class AddLandmarkFragment extends Fragment {
 
                 @Override
                 public void onFailure(@NonNull Exception exception) {
-                    Toast.makeText(getContext().getApplicationContext(), "Failed to create landmark", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext().getApplicationContext(), getString(R.string.failed_landmark_creation), Toast.LENGTH_LONG).show();
 
                 }
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -302,7 +302,7 @@ public class AddLandmarkFragment extends Fragment {
                     Landmark landmark = new Landmark(title, diff, coordinates, imageRef, desc, hint, LoginActivity.getLoggedInUser().getUserId(), foundByUsers);
                     mDatabase.child("Landmarks").child(title).setValue(landmark);
                     updateLandmarkList(landmark);
-                    Toast.makeText(getContext().getApplicationContext(), "Landmark Successfully Created", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext().getApplicationContext(), getString(R.string.successful_landmark_creation), Toast.LENGTH_LONG).show();
                     NavHostFragment.findNavController(AddLandmarkFragment.this)
                                     .navigate(R.id.action_addLandmarkFragment_to_landmarksListFragment);
                 }
@@ -310,10 +310,10 @@ public class AddLandmarkFragment extends Fragment {
 
         }else{
             loadingProgressBar.setVisibility(View.GONE);
-            Toast.makeText(getContext().getApplicationContext(), "Landmark Title Already Exists", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext().getApplicationContext(), getString(R.string.title_exists), Toast.LENGTH_LONG).show();
         }
-
     }
+
     private boolean checkTitleExists(DataSnapshot dataSnapshot, final String title){
         boolean landmarkExists = false;
         for (DataSnapshot ds : dataSnapshot.getChildren()){
@@ -327,9 +327,9 @@ public class AddLandmarkFragment extends Fragment {
 
     private void updateLandmarkList(Landmark landmark){
         HashMap<String, List<Landmark>> currentLandmarks = LoginActivity.getLandmarkItemList();
-        List<Landmark> currentFound = currentLandmarks.get("Found");
+        List<Landmark> currentFound = currentLandmarks.get(getString(R.string.found_group));
         currentFound.add(landmark);
-        currentLandmarks.put("Found", currentFound);
+        currentLandmarks.put(getString(R.string.found_group), currentFound);
         LoginActivity.setLandmarkItemList(currentLandmarks);
     }
 
@@ -406,6 +406,7 @@ public class AddLandmarkFragment extends Fragment {
                 return img;
         }
     }
+
     private static Bitmap rotateImage(Bitmap img, int degree) {
         Matrix matrix = new Matrix();
         matrix.postRotate(degree);
@@ -413,9 +414,5 @@ public class AddLandmarkFragment extends Fragment {
         img.recycle();
         return rotatedImg;
     }
-
-
-
-
 
 }

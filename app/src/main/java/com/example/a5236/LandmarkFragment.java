@@ -51,17 +51,10 @@ import java.util.List;
 
 import static androidx.core.content.ContextCompat.getSystemService;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link LandmarkFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class LandmarkFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+
 
     private final int PERMISSION_REQUEST_CODE_LOCATION = 3;
     private static Landmark landmark;
@@ -74,33 +67,16 @@ public class LandmarkFragment extends Fragment {
     static Button foundButton;
     static Button hintButton;
 
-    //final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-
     public LandmarkFragment() {
         // Required empty public constructor
     }
 
-
-//    /**
-//     * Use this factory method to create a new instance of
-//     * this fragment using the provided parameters.
-//     *
-//     * @param param1 Parameter 1.
-//     * @param param2 Parameter 2.
-//     * @return A new instance of fragment LandmarkFragment.
-//     */
-//    // TODO: Rename and change types and number of parameters
-    public static LandmarkFragment newInstance(String param1, String param2) {
+    public static LandmarkFragment newInstance() {
         LandmarkFragment fragment = new LandmarkFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -111,7 +87,6 @@ public class LandmarkFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-
         landmark = LoginActivity.getCurrentLandmark();
         mContext = (LoginActivity) getActivity();
         //Initialize fusedLocationProviderClient
@@ -131,15 +106,14 @@ public class LandmarkFragment extends Fragment {
             landmarkHint.setText(landmark.getHint());
         }
 
-
         landmarkTitle.setText(landmark.getTitle());
-        landmarkDifficulty.setText("Difficulty: " + Integer.toString(landmark.getDifficulty()));
+        landmarkDifficulty.setText(getString(R.string.landmark_difficulty)+" " + Integer.toString(landmark.getDifficulty()));
         landmarkDescription.setText(landmark.getDescription());
         if(LoginActivity.isConnectedToInternet(mContext)){
             mStorageRef = FirebaseStorage.getInstance().getReference().child(landmark.getImage());
             GlideApp.with(mContext).load(mStorageRef).into(landmarkImg);
         }else{
-            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,  getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
         }
 
         foundButton.setOnClickListener(new View.OnClickListener() {
@@ -157,7 +131,6 @@ public class LandmarkFragment extends Fragment {
                     mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-
                             int score = Integer.parseInt(snapshot.child("Accounts")
                                     .child(LoggedInUser.getUserId()).child("score").getValue().toString());
                             mDatabase.child("Accounts").child(LoggedInUser.getUserId())
@@ -165,10 +138,9 @@ public class LandmarkFragment extends Fragment {
                             Account account = LoginActivity.getUser();
                             account.setScore(score-1);
                             LoginActivity.setUser(account);
-
                             landmarkHint.setText(landmark.getHint());
                             hintButton.setEnabled(false);
-                            Toast.makeText((LoginActivity) getActivity(),"You took a hint: Score - 1!",Toast.LENGTH_SHORT).show();
+                            Toast.makeText((LoginActivity) getActivity(),getString(R.string.hint_pt_deduction),Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -176,10 +148,8 @@ public class LandmarkFragment extends Fragment {
                         }
                     });
                 }else{
-                    Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext,  getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
                 }
-
-
             }
         });
     }
@@ -192,17 +162,10 @@ public class LandmarkFragment extends Fragment {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     checkFoundLandmark();
                 }else {
-                    Toast.makeText(getActivity(), "Need Location Access", Toast.LENGTH_SHORT).show();
-                    // Explain to the user that the feature is unavailable because
-                    // the features requires a permission that the user has denied.
-                    // At the same time, respect the user's decision. Don't link to
-                    // system settings in an effort to convince the user to change
-                    // their decision.
+                    Toast.makeText(getActivity(), getString(R.string.location_access), Toast.LENGTH_SHORT).show();
                 }
                 return;
         }
-        // Other 'case' lines to check for other
-        // permissions this app might request.
     }
 
     @SuppressLint("MissingPermission")
@@ -244,7 +207,7 @@ public class LandmarkFragment extends Fragment {
                                         mDatabase.child("Landmarks").child(landmark.getTitle())
                                                 .child("foundByUsers").setValue(foundByUsersAL);
 
-                                        Toast.makeText(getActivity(), "Location Found! Score: " +
+                                        Toast.makeText(getActivity(), getString(R.string.found_pt_add)+" " +
                                                 (score + landmark.getDifficulty()), Toast.LENGTH_SHORT).show();
 
                                         updateLandmarkList(landmark);
@@ -259,20 +222,20 @@ public class LandmarkFragment extends Fragment {
                                 NavHostFragment.findNavController(LandmarkFragment.this)
                                         .navigate(R.id.action_landmarkFragment_to_landmarksListFragment);
                             }else{
-                                Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext,  getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(getActivity(), "Wrong Location!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), getString(R.string.wrong_location), Toast.LENGTH_SHORT).show();
                         }
                     }else{
-                        Toast.makeText(getActivity(), "Failed to get GPS location", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), getString(R.string.failed_location), Toast.LENGTH_SHORT).show();
                     }
                 }
             })
             .addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getActivity(), "Failed to get GPS location", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.failed_location), Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -298,12 +261,12 @@ public class LandmarkFragment extends Fragment {
 
     private void updateLandmarkList(Landmark landmark){
         HashMap<String, List<Landmark>> currentLandmarks = LoginActivity.getLandmarkItemList();
-        List<Landmark> currentFound = currentLandmarks.get("Found");
-        List<Landmark> currentNotFound = currentLandmarks.get("Not Found");
+        List<Landmark> currentFound = currentLandmarks.get(getString(R.string.found_group));
+        List<Landmark> currentNotFound = currentLandmarks.get(getString(R.string.not_found_group));
         currentFound.add(landmark);
         currentNotFound.remove(landmark);
-        currentLandmarks.put("Found", currentFound);
-        currentLandmarks.put("Not Found", currentNotFound);
+        currentLandmarks.put(getString(R.string.found_group), currentFound);
+        currentLandmarks.put(getString(R.string.not_found_group), currentNotFound);
         LoginActivity.setLandmarkItemList(currentLandmarks);
     }
 

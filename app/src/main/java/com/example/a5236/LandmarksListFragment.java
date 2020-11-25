@@ -39,8 +39,6 @@ import java.util.Map;
 public class LandmarksListFragment extends Fragment {
 
     private static final String TAG = "LandmarksListFragment";
-    private static final String notFound = "Not Found";
-    private static final String Found = "Found";
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
     List<String> landmarkGroupList;
@@ -103,7 +101,7 @@ public class LandmarksListFragment extends Fragment {
 
                 NavHostFragment.findNavController(LandmarksListFragment.this)
                         .navigate(R.id.action_landmarksListFragment_to_landmarkFragment);
-                Log.d(TAG, "CHILD CLICK LISTENER TODO");
+                Log.d(TAG, "CHILD CLICK LISTENER");
                 return false;
             }
         });
@@ -131,7 +129,7 @@ public class LandmarksListFragment extends Fragment {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE_STORAGE );
                 }else {
-                    Toast.makeText(getActivity(), "Need Camera Access", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.camera_access), Toast.LENGTH_SHORT).show();
                 }
                 return;
             case PERMISSION_REQUEST_CODE_STORAGE:
@@ -143,7 +141,7 @@ public class LandmarksListFragment extends Fragment {
                     startActivityForResult(intent,Image_Capture_Code);
 
                 }else {
-                    Toast.makeText(getActivity(), "Need Storage Access", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getString(R.string.storage_access), Toast.LENGTH_SHORT).show();
                 }
                 return;
         }
@@ -158,15 +156,15 @@ public class LandmarksListFragment extends Fragment {
                NavHostFragment.findNavController(LandmarksListFragment.this)
                         .navigate(R.id.action_landmarksListFragment_to_addLandmarkFragment);
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(getActivity(), "Cancelled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getString(R.string.cancelled), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private void prepareLandmarkInfo(){
         landmarkGroupList = new ArrayList<String>();
-        landmarkGroupList.add("Not Found");
-        landmarkGroupList.add("Found");
+        landmarkGroupList.add(getString(R.string.not_found_group));
+        landmarkGroupList.add(getString(R.string.found_group));
         landmarkItemList = LoginActivity.getLandmarkItemList();
     }
 

@@ -10,7 +10,7 @@
         android:visible="true" />
     <item
         android:id="@+id/option_update_password"
-        android:title="@string/update_password" />
+        android:title="@string/menu_update_password" />
     <item
         android:id="@+id/option_delete_account"
         android:title="@string/menu_delete_account"
