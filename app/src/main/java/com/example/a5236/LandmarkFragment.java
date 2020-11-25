@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -32,6 +34,7 @@ import com.example.a5236.ui.login.LoginFragment;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -132,8 +135,12 @@ public class LandmarkFragment extends Fragment {
         landmarkTitle.setText(landmark.getTitle());
         landmarkDifficulty.setText("Difficulty: " + Integer.toString(landmark.getDifficulty()));
         landmarkDescription.setText(landmark.getDescription());
-        mStorageRef = FirebaseStorage.getInstance().getReference().child(landmark.getImage());
-        GlideApp.with(mContext).load(mStorageRef).into(landmarkImg);
+        if(LoginActivity.isConnectedToInternet(mContext)){
+            mStorageRef = FirebaseStorage.getInstance().getReference().child(landmark.getImage());
+            GlideApp.with(mContext).load(mStorageRef).into(landmarkImg);
+        }else{
+            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+        }
 
         foundButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,29 +152,33 @@ public class LandmarkFragment extends Fragment {
         hintButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(LoginActivity.isConnectedToInternet(mContext)){
+                    mDatabase = FirebaseDatabase.getInstance().getReference();
+                    mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                mDatabase = FirebaseDatabase.getInstance().getReference();
-                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            int score = Integer.parseInt(snapshot.child("Accounts")
+                                    .child(LoggedInUser.getUserId()).child("score").getValue().toString());
+                            mDatabase.child("Accounts").child(LoggedInUser.getUserId())
+                                    .child("score").setValue(score - 1);
+                            Account account = LoginActivity.getUser();
+                            account.setScore(score-1);
+                            LoginActivity.setUser(account);
 
-                        int score = Integer.parseInt(snapshot.child("Accounts")
-                                .child(LoggedInUser.getUserId()).child("score").getValue().toString());
-                        mDatabase.child("Accounts").child(LoggedInUser.getUserId())
-                                .child("score").setValue(score - 1);
-                        Account account = LoginActivity.getUser();
-                        account.setScore(score-1);
-                        LoginActivity.setUser(account);
+                            landmarkHint.setText(landmark.getHint());
+                            hintButton.setEnabled(false);
+                            Toast.makeText((LoginActivity) getActivity(),"You took a hint: Score - 1!",Toast.LENGTH_SHORT).show();
+                        }
 
-                        landmarkHint.setText(landmark.getHint());
-                        hintButton.setEnabled(false);
-                        Toast.makeText((LoginActivity) getActivity(),"You took a hint: Score - 1!",Toast.LENGTH_SHORT).show();
-                    }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                        }
+                    });
+                }else{
+                    Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
 
             }
         });
@@ -197,61 +208,74 @@ public class LandmarkFragment extends Fragment {
     @SuppressLint("MissingPermission")
     // only called if permission is granted
     private void checkFoundLandmark() {
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                Location location = task.getResult();
-                if (location != null) {
-                    Double latitude = location.getLatitude();
-                    Double longitude = location.getLongitude();
-                    coordinates = longitude + "," + latitude;
-                    if(distance(landmark.getCoordinates(), latitude, longitude) <= 100) {
-                        //update buttons and foundByUsers locally
-                        LandmarkFragment.foundButton.setEnabled(false);
-                        LandmarkFragment.hintButton.setEnabled(false);
-                        landmark.getFoundByUsers().add(LoggedInUser.getUserId());
+        fusedLocationProviderClient.getLastLocation()
+            .addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    Location location = task.getResult();
+                    if (location != null) {
+                        Double latitude = location.getLatitude();
+                        Double longitude = location.getLongitude();
+                        coordinates = longitude + "," + latitude;
+                        if(distance(landmark.getCoordinates(), latitude, longitude) <= 100) {
+                            //update buttons and foundByUsers locally
+                            LandmarkFragment.foundButton.setEnabled(false);
+                            LandmarkFragment.hintButton.setEnabled(false);
+                            landmark.getFoundByUsers().add(LoggedInUser.getUserId());
+                            if(LoginActivity.isConnectedToInternet(mContext)){
+                                mDatabase = FirebaseDatabase.getInstance().getReference();
+                                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                        mDatabase = FirebaseDatabase.getInstance().getReference();
-                        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        int score = Integer.parseInt(snapshot.child("Accounts")
+                                                .child(LoggedInUser.getUserId()).child("score").getValue().toString());
+                                        mDatabase.child("Accounts").child(LoggedInUser.getUserId())
+                                                .child("score").setValue(landmark.getDifficulty() + score);
+                                        Account account = LoginActivity.getUser();
+                                        account.setScore(landmark.getDifficulty() + score);
+                                        LoginActivity.setUser(account);
 
-                                int score = Integer.parseInt(snapshot.child("Accounts")
-                                        .child(LoggedInUser.getUserId()).child("score").getValue().toString());
-                                mDatabase.child("Accounts").child(LoggedInUser.getUserId())
-                                        .child("score").setValue(landmark.getDifficulty() + score);
-                                Account account = LoginActivity.getUser();
-                                account.setScore(landmark.getDifficulty() + score);
-                                LoginActivity.setUser(account);
+                                        ArrayList<String> foundByUsersAL = (ArrayList<String>)
+                                                snapshot.child("Landmarks").child(landmark.getTitle())
+                                                        .child("foundByUsers").getValue();
 
-                                ArrayList<String> foundByUsersAL = (ArrayList<String>)
-                                        snapshot.child("Landmarks").child(landmark.getTitle())
-                                                .child("foundByUsers").getValue();
+                                        foundByUsersAL.add(LoggedInUser.getUserId());
+                                        mDatabase.child("Landmarks").child(landmark.getTitle())
+                                                .child("foundByUsers").setValue(foundByUsersAL);
 
-                                foundByUsersAL.add(LoggedInUser.getUserId());
-                                mDatabase.child("Landmarks").child(landmark.getTitle())
-                                        .child("foundByUsers").setValue(foundByUsersAL);
+                                        Toast.makeText(getActivity(), "Location Found! Score: " +
+                                                (score + landmark.getDifficulty()), Toast.LENGTH_SHORT).show();
 
-                                Toast.makeText(getActivity(), "Location Found! Score: " +
-                                        (score + landmark.getDifficulty()), Toast.LENGTH_SHORT).show();
+                                        updateLandmarkList(landmark);
 
-                                updateLandmarkList(landmark);
+                                    }
 
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                    }
+                                });
+
+                                NavHostFragment.findNavController(LandmarkFragment.this)
+                                        .navigate(R.id.action_landmarkFragment_to_landmarksListFragment);
+                            }else{
+                                Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
                             }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                            }
-                        });
-
-                        NavHostFragment.findNavController(LandmarkFragment.this)
-                                .navigate(R.id.action_landmarkFragment_to_landmarksListFragment);
-                    } else {
-                        Toast.makeText(getActivity(), "Wrong Location!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), "Wrong Location!", Toast.LENGTH_SHORT).show();
+                        }
+                    }else{
+                        Toast.makeText(getActivity(), "Failed to get GPS location", Toast.LENGTH_SHORT).show();
                     }
                 }
-            }
-        });
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getActivity(), "Failed to get GPS location", Toast.LENGTH_SHORT).show();
+                }
+            });
+
     }
 
     //gets distance between guess and actual location of landmark

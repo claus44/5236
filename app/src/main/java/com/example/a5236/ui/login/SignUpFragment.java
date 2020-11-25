@@ -8,6 +8,7 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -44,6 +45,8 @@ public class SignUpFragment extends Fragment {
     private ProgressBar loadingProgressBar;
     private EditText usernameEditText, passwordEditText,passwordConfirmationEditText;
     private Button signUpButton,loginButton;
+    private Context mContext;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -57,7 +60,7 @@ public class SignUpFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         signUpViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
-
+        mContext = (LoginActivity) getActivity();
         usernameEditText = view.findViewById(R.id.username);
         passwordEditText = view.findViewById(R.id.password);
         passwordConfirmationEditText = view.findViewById(R.id.passwordConfirmation);
@@ -186,34 +189,38 @@ public class SignUpFragment extends Fragment {
     }
 
     private void signUp(){
-        loadingProgressBar.setVisibility(View.VISIBLE);
-        final String username = usernameEditText.getText().toString();
-        final String password = passwordEditText.getText().toString();
-        String passwordConfirm = passwordConfirmationEditText.getText().toString();
-        if(password.equals(passwordConfirm)){
-            mDatabase = FirebaseDatabase.getInstance().getReference();
-            user = new LoggedInUser(username);
-            mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    boolean userExists = checkUsernameExists(snapshot, username, password);
-                    if(!userExists){
-                        signUpViewModel.register(true, user, true);
-                        LoginActivity.setLoggedInUser(user);
-                        LoginActivity.retrieveLandmarkData(snapshot);
-                        LoginActivity.retrieveLeaderboardData(snapshot);
-                        NavHostFragment.findNavController(SignUpFragment.this)
-                                .navigate(R.id.action_signUpFragment_to_landmarkActivity);
-                    }else{
-                        signUpViewModel.register(true, user, false);
-                        loadingProgressBar.setVisibility(View.GONE);
+        if(LoginActivity.isConnectedToInternet(mContext)){
+            loadingProgressBar.setVisibility(View.VISIBLE);
+            final String username = usernameEditText.getText().toString();
+            final String password = passwordEditText.getText().toString();
+            String passwordConfirm = passwordConfirmationEditText.getText().toString();
+            if(password.equals(passwordConfirm)){
+                mDatabase = FirebaseDatabase.getInstance().getReference();
+                user = new LoggedInUser(username);
+                mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean userExists = checkUsernameExists(snapshot, username, password);
+                        if(!userExists){
+                            signUpViewModel.register(true, user, true);
+                            LoginActivity.setLoggedInUser(user);
+                            LoginActivity.retrieveLandmarkData(snapshot);
+                            LoginActivity.retrieveLeaderboardData(snapshot);
+                            NavHostFragment.findNavController(SignUpFragment.this)
+                                    .navigate(R.id.action_signUpFragment_to_landmarkActivity);
+                        }else{
+                            signUpViewModel.register(true, user, false);
+                            loadingProgressBar.setVisibility(View.GONE);
+                        }
                     }
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) { }
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) { }
+                });
+            }else{
+                signUpViewModel.register(false, user, false);
+            }
         }else{
-            signUpViewModel.register(false, user, false);
+            Toast.makeText(mContext,  "No Internet", Toast.LENGTH_SHORT).show();
         }
     }
 }

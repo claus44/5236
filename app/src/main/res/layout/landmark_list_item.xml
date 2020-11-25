@@ -1,41 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="100">
+    android:orientation="vertical"
+   >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="66.6">
-        <ImageView
-            android:id="@+id/landmarkItemImage"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"/>
+            android:layout_height="wrap_content"
+            android:layout_weight="66.6">
+
+            <ImageView
+                android:id="@+id/landmarkItemImage"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:src="@android:drawable/ic_menu_gallery" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="33.3"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/landmarkListItemTitle"
+                android:layout_width="match_parent"
+
+                android:layout_height="30dp"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/landmarkListItemDescription"
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+                android:gravity="center" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
+    <Button
+        android:id="@+id/load_more_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="33.3">
-
-        <TextView
-            android:id="@+id/landmarkListItemTitle"
-            android:gravity="center"
-
-            android:layout_width="match_parent"
-            android:layout_height="30dp" />
-
-        <TextView
-            android:id="@+id/landmarkListItemDescription"
-            android:gravity="center"
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
+        android:text="Load More" />
 
 
 </LinearLayout>
