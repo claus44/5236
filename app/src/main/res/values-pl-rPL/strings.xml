@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Columbus Atrakcje</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="action_sign_in">Zaloguj się</string>
+    <string name="action_register">Utrwórz nowe konto</string>
+    <string name="action_sign_in_short">Zaloguj się</string>
+    <string name="welcome">Witaj</string>
+    <string name="profile">Profil</string>
+    <string name="next">Następny</string>
+    <string name="back">Z Powrotem</string>
+    <string name="camera">Kamera</string>
+
+    <!-- Strings related to login and sign up-->
+    <string name="prompt_username">Nazwa Użytkownika</string>
+    <string name="prompt_password">Hasło</string>
+    <string name="prompt_password_confirmation">Potwierdz Hasło</string>
+    <string name="action_login">Masz już konto?</string>
+    <string name="permission_denied">Brak Uprawnień</string>
+    <string name="invalid_username">To nie jest poprawna nazwa użytkownika</string>
+    <string name="invalid_password">Hasło musi być >5 znaków</string>
+    <string name="login_failed">Nieudało się zalogować</string>
+    <string name="registration_failed">Nazwę użytkownika już istnieje</string>
+    <string name="password_confirmation_failed">Hasła się nie zgadzają</string>
+
+    <!-- Strings related to landmark list -->
+    <string name="load_more">Załaduj więcej</string>
+    <string name="found_group">Znalezione</string>
+    <string name="not_found_group">Nieznalezione</string>
+
+    <!-- Strings related to landmark view -->
+    <string name="landmark_title">Tytuł</string>
+    <string name="landmark_description">Opisanie</string>
+    <string name="landmark_difficulty">Trudnosć:</string>
+    <string name="landmark_found_btn">Znalałeś!</string>
+    <string name="landmark_hint_btn">Podpowiedź?</string>
+    <string name="landmark_hint_header">Podpowiedź:</string>
+    <string name="hint_pt_deduction">Skorzystałeś z podpowiedzi: Wynik -1!</string>
+    <string name="found_pt_add">Miejsce Znalezione! Wynik:</string>
+    <string name="wrong_location">Złe Miejsce!</string>
+    <string name="prompt_title">Dodaj tytuł</string>
+    <string name="prompt_description">Dodaj opis</string>
+    <string name="prompt_hint">Dodaj podpowiedź</string>
+    <string name="prompt_difficulty">1-łatwy 10-trudny</string>
+    <string name="hint_difficulty">1</string>
+    <string name="action_create_landmark">Stworz nowe miejsce</string>
+    <string name="action_rotate_image">Obróć</string>
+    <string name="action_retry">Spróbuj ponownie</string>
+    <string name="title_error">Tytuł jest wymagany</string>
+    <string name="desc_error">Opis jest wymagany</string>
+    <string name="hint_error">Podpowiedź jest wymagana</string>
+    <string name="diff_error">Trudność między 1 a 10 jest wymagane</string>
+    <string name="title_contains_error">Tytuł może tylko mieć litery i cyfry</string>
+    <string name="failed_landmark_creation">Nieudało się stworzyć nowe miejsce</string>
+    <string name="successful_landmark_creation">"Miejsce było poprawnie stworzone "</string>
+    <string name="title_exists">Miejsce juz było stworzone</string>
+
+    <!-- Strings related to profile -->
+    <string name="profile_username">Nazwa Użytkownika</string>
+    <string name="profile_score">Wynik</string>
+    <string name="profile_leaderboard">Tablica Wyników</string>
+    <string name="profile_friend_switch">"Tylko Znajomi "</string>
+
+    <!-- Strings related to menu -->
+    <!-- Strings for Add Friend -->
+    <string name="menu_add_friend">Dodać znajomego</string>
+    <string name="added">Dodano</string>
+    <string name="added_friend">jako znajomy</string>
+    <string name="already_friend">jest już znajomym</string>
+    <string name="menu_remove_friend">Usuń znajomego</string>
+
+    <!-- Strings for Remove Friend -->
+    <string name="removed">Usunięto</string>
+    <string name="from_friends">od znajomych</string>
+    <string name="not_a_friend">nie jest już znajomym</string>
+    <string name="menu_friend_msg">Podaj nazwe użytkownika</string>
+    <string name="does_not_exist">nie istnieje</string>
+
+    <!-- Strings for updating password -->
+    <string name="menu_update_password">Uaktualnij hasło</string>
+    <string name="menu_update_pass_msg">Podaj twoje nowe hasło</string>
+    <string name="update_pass_success">Hasło było poprawnie uaktualnione</string>
+    <string name="update_pass_failure">Nie udało się hasła aktualizować</string>
+
+    <!-- Strings for deleting account -->
+    <string name="menu_delete_account">Usuń Konto</string>
+    <string name="menu_delete_account_msg">Jesteś pewny? Wpisz nazwe użytkownika żeby potwierdzić.</string>
+    <string name="account_deletion_success">Poprawnie usunięto konto</string>
+    <string name="account_deletion_failure">Nieudało usunąć konto</string>
+
+    <!-- Strings for logout -->
+    <string name="menu_logout">Wyloguj się</string>
+    <string name="menu_logout_msg">Jesteś pewny że chcesz wylogować się?</string>
+
+    <!-- Strings for dialog options -->
+    <string name="confirm">Potwierdzam</string>
+    <string name="cancel">odwołuję</string>
+    <string name="yes">Tak</string>
+    <string name="no">Nie</string>
+
+    <!-- Strings related to access & failures -->
+    <string name="no_internet">Nie ma Internetu</string>
+    <string name="network_connect_failure">Problemy z Połączenie do Sieci</string>
+    <string name="location_access">Potrzeba dostęp do dany lokalizacji</string>
+    <string name="failed_location">Nie udało się dostać GPS lokalizacje</string>
+    <string name="cancelled">Odwołano</string>
+    <string name="camera_access">Potrzeba dostęp do Kamery</string>
+    <string name="storage_access">Potrzeba dostęp do Pamięci</string>
+</resources>
