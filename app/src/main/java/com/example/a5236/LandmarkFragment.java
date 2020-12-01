@@ -241,7 +241,7 @@ public class LandmarkFragment extends Fragment {
 
     }
 
-    //gets distance between guess and actual location of landmark
+    //gets distance between guess and actual location of landmark using the haversine formula.
     public static double distance(String landmarkCoordinates, double latGuess, double lonGuess) {
 
         final int R = 6371; // Radius of the earth
