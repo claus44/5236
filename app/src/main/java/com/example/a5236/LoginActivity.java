@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import com.example.a5236.data.model.LoggedInUser;
+import com.example.a5236.ui.login.LoginFragment;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,6 +21,9 @@ import com.google.firebase.database.ValueEventListener;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -55,6 +59,10 @@ public class LoginActivity extends AppCompatActivity {
     private String response;
     public static Menu myMenu;
     private DatabaseReference mDatabase;
+
+    public LoginFragment loginFragment;
+    public NavHostFragment navHostFragment;
+
 
     public static Account getUser() { return user; }
     public static void setUser(Account user) { LoginActivity.user = user; }
@@ -458,5 +466,34 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(mContext,  mContext.getResources().getString(R.string.network_connect_failure), Toast.LENGTH_SHORT).show();
         }
         return isConnected = false;
+    }
+
+    public NavHostFragment getNHFragmentForTest() {
+        return navHostFragment;
+    }
+
+    public LoginFragment getLoginFragmentForTest() {
+        recoverLoginFragment();
+        return loginFragment;
+    }
+
+    private void recoverLoginFragment() {
+        if (loginFragment == null) {
+            // Did we already create a fragment? If so, pick the last created fragment where
+            // the Tic-Tac-Toe game is being played.
+            FragmentManager fm = getSupportFragmentManager();
+            if (fm.getFragments().size() == 0) {
+                loginFragment = new LoginFragment();
+            }
+            else {
+                for (Fragment fragment: fm.getFragments()) {
+                    Fragment childFragment = fragment.getChildFragmentManager().getFragments().get(0);
+                    if (childFragment instanceof LoginFragment) {
+                        loginFragment = (LoginFragment) childFragment;
+                        navHostFragment = (NavHostFragment) fragment;
+                    }
+                }
+            }
+        }
     }
 }

@@ -38,7 +38,7 @@ public class LoginActivityTest_LoginLogout {
     public ActivityTestRule<LoginActivity> mActivityTestRule = new ActivityTestRule<>(LoginActivity.class);
 
     @Test
-    public void loginActivityTest_LoginLogout() {
+    public void loginActivityTest_LoginLogout() throws InterruptedException {
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.username),
                         childAtPosition(
@@ -82,9 +82,9 @@ public class LoginActivityTest_LoginLogout {
                                 2),
                         isDisplayed()));
         appCompatButton.perform(click());
-
+        Thread.sleep(2000);
         ViewInteraction overflowMenuButton = onView(
-                allOf(withContentDescription("More options"),
+                allOf(
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.toolbar),
